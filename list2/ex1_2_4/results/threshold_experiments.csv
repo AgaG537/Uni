@@ -1,0 +1,8 @@
+Threshold,n,k,AvgComparisons,AvgSwaps
+Threshold 5: Overall average operations = 222377.21
+Threshold 10: Overall average operations = 223030.16
+Threshold 15: Overall average operations = 221260.73
+Threshold 20: Overall average operations = 221910.34
+Threshold 25: Overall average operations = 222952.13
+Threshold 30: Overall average operations = 222215.01
+Optimal threshold determined: Threshold 15: Overall average operations = 221260.73

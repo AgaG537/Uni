@@ -1,0 +1,34 @@
+aga@inspiron:~/aisd/mw1$ # Agnieszka Głuszkiewicz 279781
+aga@inspiron:~/aisd/mw1$ svn export https://repo.cs.pwr.edu.pl/279781-dir/mw1/list1
+A    list1
+A    list1/ex1.cpp
+A    list1/ex2.cpp
+A    list1/ex3.cpp
+Exported revision 1.
+aga@inspiron:~/aisd/mw1$ cd list1
+aga@inspiron:~/aisd/mw1/list1$ g++ -Wall -pedantic ex1.cpp -o ex1               
+aga@inspiron:~/aisd/mw1/list1$ ./ex1
+Pushing to FIFO: 
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 
+Popping from FIFO: 
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 
+Pushing to LIFO: 
+1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 
+Popping from LIFO: 
+50 49 48 47 46 45 44 43 42 41 40 39 38 37 36 35 34 33 32 31 30 29 28 27 26 25 24 23 22 21 20 19 18 17 16 15 14 13 12 11 10 9 8 7 6 5 4 3 2 1 
+aga@inspiron:~/aisd/mw1/list1$ g++ -Wall -pedantic ex2.cpp -o ex2               
+aga@inspiron:~/aisd/mw1/list1$ ./ex2                             
+List 1: 10 96 76 73 16 68 31 73 79 87 
+List 2: 68 60 98 50 44 83 98 34 84 99 
+Merged list: 10 60 98 50 44 83 98 34 84 99 68 96 76 73 16 68 31 73 79 87 
+Average cost (elements from the list): 4734.43
+Average cost (random elements): 9479.47
+aga@inspiron:~/aisd/mw1/list1$ g++ -Wall -pedantic ex3.cpp -o ex3               
+aga@inspiron:~/aisd/mw1/list1$ ./ex3                             
+List 1: 68 72 54 96 91 73 39 28 46 14 
+List 2: 52 54 53 62 85 75 22 85 74 83 
+Merged list: 68 72 54 96 91 73 39 28 46 14 52 54 53 62 85 75 22 85 74 83 
+Average cost (elements from the list): 4771.83
+Average cost (random elements): 9467.07
+aga@inspiron:~/aisd/mw1/list1$ tmux capture-pane -p -S'-' -E'-' -J > log-list1 
+
