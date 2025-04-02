@@ -31,7 +31,6 @@ bool is_sorted(const vector<int>& arr) {
     return true;
 }
 
-// Insertion sort for small subarrays, with intermediate state printing
 void insertionSort(vector<int>& arr, int low, int high) {
     for (int i = low + 1; i <= high; i++) {
         int j = i;
@@ -62,7 +61,6 @@ int partition(vector<int>& arr, int low, int high) {
     return i + 1;
 }
 
-// Hybrid QuickSort: switch to insertion sort if subarray is small; print intermediate states.
 void hybridQuickSort(vector<int>& arr, int low, int high) {
     if (low < high) {
         if (high - low < THRESHOLD) {
@@ -99,8 +97,9 @@ int main() {
     hybridQuickSort(arr, 0, n - 1);
     
     if (n < 40) {
-        cout << "Input array (for comparison):" << endl;
+        cout << "Initial array:" << endl;
         printArray(original);
+        
         cout << "Sorted array:" << endl;
         printArray(arr);
     }

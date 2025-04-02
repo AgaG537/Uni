@@ -2,7 +2,6 @@
 #include <vector>
 #include <iomanip>
 #include <algorithm>
-
 using namespace std;
 
 int comparisons = 0;
@@ -14,7 +13,7 @@ bool compare(int a, int b) {
 }
 
 void swap_keys(vector<int>& arr, int i, int j) {
-    if (i != j) { // Unikamy zbędnych swapów
+    if (i != j) {
         swaps++;
         swap(arr[i], arr[j]);
     }
@@ -34,8 +33,7 @@ bool is_sorted(const vector<int>& arr) {
     return true;
 }
 
-// Poprawiona funkcja dual pivot partitioning
-void dualPivotPartition(vector<int>& arr, int low, int high, int& lp, int& rp) {
+void dualPivotPartition(vector<int>& arr, int low, int high, int& lp, int& rp, int n) {
     if (low >= high) return;
 
     if (compare(arr[high], arr[low])) 
@@ -43,15 +41,31 @@ void dualPivotPartition(vector<int>& arr, int low, int high, int& lp, int& rp) {
 
     int p = arr[low], q = arr[high];
     int lt = low + 1, gt = high - 1, i = low + 1;
+    int small_count = 0, large_count = 0;
 
     while (i <= gt) {
-        if (compare(arr[i], p)) {  
-            swap_keys(arr, i, lt);
-            lt++;
-        } else if (compare(q, arr[i])) { 
-            swap_keys(arr, i, gt);
-            gt--;
-            i--; // Ponowne sprawdzenie zamienionego elementu
+        if (large_count > small_count) {
+            if (compare(q, arr[i])) {
+                swap_keys(arr, i, gt);
+                gt--;
+                large_count++;
+                continue;
+            } else if (compare(arr[i], p)) {
+                swap_keys(arr, i, lt);
+                lt++;
+                small_count++;
+            }
+        } else {
+            if (compare(arr[i], p)) {
+                swap_keys(arr, i, lt);
+                lt++;
+                small_count++;
+            } else if (compare(q, arr[i])) {
+                swap_keys(arr, i, gt);
+                gt--;
+                large_count++;
+                continue;
+            }
         }
         i++;
     }
@@ -61,21 +75,31 @@ void dualPivotPartition(vector<int>& arr, int low, int high, int& lp, int& rp) {
 
     lp = lt;
     rp = gt;
+
+    if (n < 40) {
+        cout << "After partitioning [" << low << ", " << high << "], pivots at " 
+             << lp << " and " << rp << ": ";
+        printArray(arr);
+    }
 }
 
-// Poprawiona rekurencyjna wersja Dual Pivot Quick Sort
-void dualPivotQuickSort(vector<int>& arr, int low, int high) {
+void dualPivotQuickSort(vector<int>& arr, int low, int high, int n) {
     if (low >= high) return;
 
     int lp, rp;
-    dualPivotPartition(arr, low, high, lp, rp);
+    dualPivotPartition(arr, low, high, lp, rp, n);
 
-    if (lp > low)  // Sprawdzenie, czy zakres jest poprawny
-        dualPivotQuickSort(arr, low, lp - 1);
-    if (lp + 1 < rp)  // Zapewnienie poprawnej rekurencji
-        dualPivotQuickSort(arr, lp + 1, rp - 1);
-    if (rp < high)  
-        dualPivotQuickSort(arr, rp + 1, high);
+    if (lp > low)
+        dualPivotQuickSort(arr, low, lp - 1, n);
+    if (lp + 1 < rp)
+        dualPivotQuickSort(arr, lp + 1, rp - 1, n);
+    if (rp < high)
+        dualPivotQuickSort(arr, rp + 1, high, n);
+
+    if (n < 40) {
+        cout << "After sorting [" << low << ", " << high << "]: ";
+        printArray(arr);
+    }
 }
 
 int main() {
@@ -93,10 +117,12 @@ int main() {
         printArray(original);
     }
 
-    dualPivotQuickSort(arr, 0, n - 1);
+    dualPivotQuickSort(arr, 0, n - 1, n);
 
     if (n < 40) {
-        cout << "Sorted array:" << endl;
+        cout << "Initial array (for comparison):" << endl;
+        printArray(original);
+        cout << "Final sorted array:" << endl;
         printArray(arr);
     }
 

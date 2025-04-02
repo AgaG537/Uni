@@ -1,13 +1,9 @@
 #!/bin/bash
-# This script tests different threshold values for hybrid_sort and determines the optimal one.
-# It runs hybrid_sort for n values in {1000, 5000, 10000, 20000} with different thresholds,
-# using a fixed seed for reproducibility and k repetitions for each experiment.
-# Results are saved to "threshold_experiments.csv" and the optimal threshold is displayed.
 
 RESULTS_FILE="results/threshold_experiments.csv"
 echo "Threshold,n,k,AvgComparisons,AvgSwaps" > $RESULTS_FILE
 
-k=100          # Number of repetitions for each experiment
+k=100     # Number of repetitions for each experiment
 
 # Loop over threshold values to test
 for threshold in 5 10 15 20 25 30; do
@@ -20,7 +16,6 @@ for threshold in 5 10 15 20 25 30; do
         totalSwaps=0
         # Perform k independent repetitions
         for ((i=1; i<=k; i++)); do
-            # Assume gen_random accepts seed as second parameter.
             output=$(./gen_random $n | ./hybrid_sort $threshold)
             comp=$(echo "$output" | grep "Comparisons:" | awk '{print $2}')
             swaps=$(echo "$output" | grep "Swaps:" | awk '{print $2}')

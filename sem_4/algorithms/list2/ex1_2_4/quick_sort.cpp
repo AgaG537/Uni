@@ -43,7 +43,6 @@ int partition(vector<int>& arr, int low, int high) {
     return i + 1;
 }
 
-// Quick Sort with printing of intermediate states (after partition)
 void quickSort(vector<int>& arr, int low, int high) {
     if (low < high) {
         int p = partition(arr, low, high);
@@ -74,8 +73,9 @@ int main() {
     quickSort(arr, 0, n - 1);
 
     if (n < 40) {
-        cout << "Input array (for comparison):" << endl;
+        cout << "Initial array:" << endl;
         printArray(original);
+        
         cout << "Sorted array:" << endl;
         printArray(arr);
     }

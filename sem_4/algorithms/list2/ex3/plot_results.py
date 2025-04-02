@@ -14,7 +14,7 @@ df_large = df[df["n"] >= 1000].copy()
 
 def plot_results(df, dataset_type):
     ks = df["k"].unique()
-    metrics = ["AvgComparisons", "AvgSwaps"]
+    metrics = ["AvgComparisons"]
     
     print(f"Generating plots for {dataset_type}...")
 
@@ -50,3 +50,4 @@ plot_results(df_small, "small_n")
 plot_results(df_large, "large_n")
 
 print("Plots have been saved in the 'results/' directory.")
+
