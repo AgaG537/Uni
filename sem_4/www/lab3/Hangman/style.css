@@ -1,0 +1,113 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f0f4f8;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  #game-container {
+    max-width: 600px;
+    width: 100%;
+    background: #ffffff;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  canvas {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    margin: 10px auto;
+    display: block;
+  }
+  
+  #word-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 15px 0;
+    gap: 8px;
+  }
+  
+  .letter-box {
+    width: 32px;
+    height: 45px;
+    border-bottom: 3px solid #333;
+    font-size: 28px;
+    line-height: 45px;
+    text-align: center;
+    margin: 0 2px;
+  }
+  
+  #letters-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .letter-btn {
+    padding: 10px 14px;
+    font-size: 18px;
+    background: #e2e6ea;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+  }
+  
+  .letter-btn:hover {
+    background: #cdd4da;
+  }
+  
+  .letter-btn.selected {
+    background: #4c86ff;
+    color: white;
+    cursor: default;
+  }
+  
+  .control-btn {
+    background-color: #4c86ff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    margin: 0 8px;
+    font-size: 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .control-btn:hover {
+    background-color: #3a6dd8;
+  }
+  
+  #message {
+    font-size: 18px;
+    margin-top: 15px;
+    color: #333;
+  }
+  
+  /* Responsive */
+  @media (max-width: 480px) {
+    .letter-btn {
+      padding: 8px 10px;
+      font-size: 16px;
+    }
+  
+    .letter-box {
+      width: 26px;
+      height: 38px;
+      font-size: 22px;
+    }
+  
+    canvas {
+      width: 100%;
+      height: auto;
+    }
+  }
+  
