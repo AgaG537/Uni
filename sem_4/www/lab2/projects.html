@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projects</title>
+    <link rel="stylesheet" type="text/css" href="sass/style.min.css">
+</head>
+<body>
+    <header>
+        <h1>My Projects</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">About Me</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="hobbies.html">Hobbies</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section>
+            <h2>Selected Projects</h2>
+            
+            <article>
+                <h3>Chinese Checkers (Java)</h3>
+                <p>This Java project was created by me and my friend. It is a digital version of the classic board game Chinese Checkers, where players aim to move all their marbles across the board to the opposite side before their opponents do.</p>
+                <p>The game supports different variants, including "Order Out of Chaos" and "Yin-Yang" modes, providing alternative gameplay styles. The implementation includes a turn-based system and an interactive graphical interface.</p>
+                <pre><code>
+public static Board createBoard(int marbles, int numOfPlayers, String variant, int seed) {
+    return switch (variant) {
+        case "order" -> new OrderBoardManager(marbles, numOfPlayers, seed);
+        case "yinyang" -> new YinYangBoardManager(marbles, seed);
+        default ->  new BoardManager(marbles, numOfPlayers, seed);
+    };
+}
+                </code></pre>
+                <div class="image-group-2">
+                    <img src="images/chinese_checkers_start.png" alt="Chinese Checkers start view">
+                    <img src="images/chinese_checkers_board.png" alt="Chinese Checkers board view" class="big-screens">
+                    <img src="images/chinese_checkers_game.png" alt="Chinese Checkers game view">
+                </div>
+            </article>
+
+            <article>
+                <h3>Hair Salon App (Java + MariaDB SQL)</h3>
+                <p>I developed this project using Java for the application logic and MariaDB SQL for data storage. It is designed to be a functional system for managing appointments in hair salons.</p>
+                <p>The application allows users to book appointments, view available time slots, and manage their reservations. Hairdressers can access their schedules and update appointment statuses. The system ensures smooth data handling through a well-structured database, making it efficient for real-world use.</p>
+                <pre><code>
+public static String addAppointment(Appointment appointment) {
+    String query = "INSERT INTO appointments (date, time, hairdresser_id, status) VALUES (?, ?, ?, ?)";
+    
+    try (Connection conn = dataSource.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(query)) {
+    
+        stmt.setString(1, appointment.getDate());
+        stmt.setString(2, appointment.getTime());
+        stmt.setInt(3, appointment.getHairdresserId());
+        stmt.setString(4, appointment.getStatus());
+        stmt.executeUpdate();
+    
+    } catch (SQLException e) {
+        return e.getMessage();
+    }
+    return "";
+}
+                </code></pre>
+                <div class="image-group-2">
+                    <img src="images/hairsalon_login.png" alt="Hair Salon App login view">
+                    <img src="images/hairsalon_user_info.png" alt="Hair Salon App user info view" class="big-screens">
+                    <img src="images/hairsalon_appointments.png" alt="Hair Salon App appointments view">
+                </div>
+            </article>
+
+            <article>
+                <h3>Series News Website (HTML + CSS)</h3>
+                <p>This web project was developed by me and two of my friends. It is a website dedicated to TV series, providing users with the latest news, upcoming premiere dates, and rankings of the most popular productions. The goal was to create an engaging and informative platform for TV series enthusiasts.</p>
+                <pre><code>
+&lt;nav class="navbar navbar-expand-sm bg-dark navbar-dark"&gt;
+    &lt;div class="container-fluid justify-content-center"&gt;
+        &lt;ul class="navbar-nav"&gt;
+            &lt;li class="nav-item"&gt;
+                &lt;h5&gt;&lt;a class="nav-link active" href="#"&gt;&lt;strong&gt;STRONA GŁÓWNA&lt;/strong&gt;&lt;/a&gt;&lt;/h5&gt;
+            &lt;/li&gt;
+            &lt;li class="nav-item"&gt;
+                &lt;h5&gt;&lt;a class="nav-link" href="premiery.html"&gt;&lt;strong&gt;PREMIERY&lt;/strong&gt;&lt;/a&gt;&lt;/h5&gt;
+            &lt;/li&gt;
+            &lt;li class="nav-item"&gt;
+                &lt;h5&gt;&lt;a class="nav-link" href="top.html"&gt;&lt;strong&gt;TOP&lt;/strong&gt;&lt;/a&gt;&lt;/h5&gt;
+            &lt;/li&gt;
+            &lt;li class="nav-item"&gt;
+                &lt;h5&gt;&lt;a class="nav-link" href="mojeKonto.html"&gt;&lt;strong&gt;MOJE KONTO&lt;/strong&gt;&lt;/a&gt;&lt;/h5&gt;
+            &lt;/li&gt;
+        &lt;/ul&gt;
+    &lt;/div&gt;
+&lt;/nav&gt;
+                </code></pre>
+                <div class="image-group-2">
+                    <img src="images/series1.png" alt="Series site view">
+                    <img src="images/series2.png" alt="Series site news view" class="big-screens">
+                    <img src="images/series3.png" alt="Series site top view">
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <footer>
+        <a class="mail" href="mailto:agnieszkag537@gmail.com">Contact: agnieszkag537@gmail.com</a>
+        <p>&copy; 2025 My Portfolio</p>
+    </footer>
+</body>
+</html>

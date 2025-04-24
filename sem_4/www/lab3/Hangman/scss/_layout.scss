@@ -1,0 +1,74 @@
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: $bg-color;
+    margin: 0;
+    padding: 20px;
+    display: flex;
+    justify-content: center;
+  }
+  
+  .hidden {
+    display: none !important;
+  }
+  
+  #start-screen {
+    text-align: center;
+    max-width: 600px;
+    margin: auto;
+  }
+  
+  .start-image {
+    max-width: 100%;
+    height: auto;
+    margin: 20px 0;
+  }
+  
+  #game-container {
+    max-width: 600px;
+    width: 100%;
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+    text-align: center;
+  }
+  
+  canvas {
+    background: #fafafa;
+    border: 1px solid #ddd;
+    margin: 10px auto;
+    display: block;
+  }
+  
+  #word-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin: 15px 0;
+    gap: 8px;
+  }
+  
+  .letter-box {
+    width: 32px;
+    height: 45px;
+    border-bottom: 3px solid $text-dark;
+    font-size: 28px;
+    line-height: 45px;
+    text-align: center;
+    margin: 0 2px;
+  }
+  
+  #letters-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  #message {
+    font-size: 18px;
+    margin-top: 15px;
+    color: $text-dark;
+  }
+  
