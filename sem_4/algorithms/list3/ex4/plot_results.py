@@ -15,9 +15,11 @@ results = []
 for scenario in scenarios:
     data = df[df['scenario'] == scenario].copy()
 
-    x = np.log2(data['n'])
+    x = np.log(data['n'])
     y_comp = data['comparisons']
     y_time = remove_outliers(data['time_microsec'])  # oczyszczony czas
+    # y_time = data['time_microsec'] 
+
 
     # usunięcie NaN po filtrze odstających
     mask = ~y_time.isna()
@@ -41,27 +43,28 @@ print(df_factors)
 plt.figure(figsize=(10, 6))
 for scenario in scenarios:
     data = df[df['scenario'] == scenario]
-    plt.plot(np.log2(data['n']), data['comparisons'], label=scenario)
-plt.xlabel('log2(n)')
+    plt.plot(np.log(data['n']), data['comparisons'], label=scenario)
+plt.xlabel('ln(n)')
 plt.ylabel('comparisons')
-plt.title('Number of Comparisons vs log2(n)')
+plt.title('Number of Comparisons vs ln(n)')
 plt.legend()
 plt.grid(True)
-plt.savefig("comparisons_vs_log2n.png")
+plt.savefig("comparisons_vs_ln_n.png")
 plt.show()
 
 # Wykresy: czas po usunięciu wartości odstających
 plt.figure(figsize=(10, 6))
 for scenario in scenarios:
     data = df[df['scenario'] == scenario].copy()
+    # y_time = data['time_microsec']
     y_time = remove_outliers(data['time_microsec'])
-    plt.plot(np.log2(data['n']), y_time, label=scenario)
-plt.xlabel('log2(n)')
+    plt.plot(np.log(data['n']), y_time, label=scenario)
+plt.xlabel('ln(n)')
 plt.ylabel('time (microseconds)')
-plt.title('Execution Time vs log2(n')
+plt.title('Execution Time vs ln(n)')
 plt.legend()
 plt.grid(True)
-plt.savefig("time_vs_log2n_filtered.png")
+plt.savefig("time_vs_ln_n.png")
 plt.show()
 
 
