@@ -67,7 +67,7 @@ main {
 }
 
 h1 {
-    padding: 10px 0px;
+    padding: 5px 0px;
 }
 
 h2 {
@@ -200,7 +200,7 @@ footer {
     display: block;
     font-size: 30px;
     color: $additional-text-color;
-    padding: 5px 15px 15px 0px;
+    padding: 0px 15px 10px 0px;
     cursor: pointer;
     float: right;
 }
@@ -219,16 +219,16 @@ nav ul {
 
 @include responsive(small) {
     nav ul {
-        display: flex !important;
+        display: flex;
         flex-direction: row;
         justify-content: space-around;
     }
 
     .hamburger-menu {
-        display: none !important;
+        display: none;
     }
 
     nav ul li {
-        padding: 0; // reset padding if needed
+        padding: 0;
     }
 }

@@ -1,13 +1,8 @@
-// @import "variables";
-// @import "layout";
-// @import "buttons";
-
 $bg-color: #f0f4f8;
 $primary: #4c86ff;
 $primary-dark: #3a6dd8;
 $text-dark: #333;
 $light-grey: #e2e6ea;
-
 
 
 body {
@@ -20,7 +15,7 @@ body {
   }
   
   .hidden {
-    display: none !important;
+    display: none;
   }
   
   #start-screen {
@@ -70,16 +65,6 @@ body {
     margin: 0 2px;
   }
   
-//   #letters-container {
-//     display: flex;
-//     max-width: 600px;
-//     width: 80%;
-//     margin: 0 auto;
-//     flex-wrap: wrap;
-//     justify-content: center;
-//     gap: 8px;
-//     margin: 20px 0px;
-//   }
   #letters-container {
     width: 82%;
     margin: 0 auto;
