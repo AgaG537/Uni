@@ -1,0 +1,6 @@
+    scenario  c_comp  c_time
+0  beginning   2.106   0.018
+1     middle   2.106   0.014
+2        end   2.106   0.032
+3     absent   2.106   0.031
+4     random   2.175   0.029
