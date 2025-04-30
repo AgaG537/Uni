@@ -46,14 +46,22 @@ const galleryImages = [
 function loadGallery() {
     const gallery = document.getElementById("dynamic-gallery");
 
-    Promise.all(galleryImages.map(function (img) {
+    Promise.allSettled(galleryImages.map(function (img) {
         return loadImage(img.src, img.alt);
-    })).then(function (images) {
-        images.forEach(function (image) {
-            gallery.appendChild(image);
+    })).then(function (results) {
+        let success = false;
+
+        results.forEach(function (result) {
+            if (result.status === "fulfilled") {
+                gallery.appendChild(result.value);
+                success = true;
+            } else {
+                console.error("Image loading failed:", result.reason);
+            }
         });
-    }).catch(function (err) {
-        console.error("Gallery loading error:", err);
-        gallery.innerHTML = "<p>Failed to load images.</p>";
+
+        if (!success) {
+            gallery.innerHTML = "<p>Failed to load images.</p>";
+        }
     });
 }
