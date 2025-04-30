@@ -1,0 +1,6 @@
+quick_sort: a ≈ 1.7492
+dual_pivot_quick_sort: a ≈ 1.5412
+select_qs: a ≈ 10.1451
+select_dpqs: a ≈ 13.1802
+Estimating for worst case qs data:
+quick_sort: a ≈ 9.2733

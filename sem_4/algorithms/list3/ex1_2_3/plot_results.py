@@ -8,7 +8,6 @@ for k in ks:
     df_rand = pd.read_csv(f'results2/k{k}/random_select.csv')
     df_median = pd.read_csv(f'results2/k{k}/select.csv')
 
-    # Wykres porównań
     plt.figure(figsize=(10, 5))
     plt.plot(df_rand['n'], df_rand['comparisons'], label='Random Select', marker='o', linewidth=1)
     plt.plot(df_median['n'], df_median['comparisons'], label='Select', marker='s', linewidth=1)
@@ -21,7 +20,6 @@ for k in ks:
     plt.savefig(f'results2/k{k}/comparisons_k{k}.png')
     plt.close()
 
-    # Wykres przestawień
     plt.figure(figsize=(10, 5))
     plt.plot(df_rand['n'], df_rand['swaps'], label='Random Select', marker='o', linewidth=1)
     plt.plot(df_median['n'], df_median['swaps'], label='Select', marker='s', linewidth=1)

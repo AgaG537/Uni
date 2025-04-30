@@ -5,9 +5,6 @@
 #include <algorithm>
 using namespace std;
 
-// int comparisons = 0;
-// int swaps = 0;
-
 bool compare(int a, int b) {
     comparisons++;
     return a < b;
@@ -35,7 +32,6 @@ int partition(vector<int>& arr, int low, int high) {
     vector<int> temp(arr.begin() + low, arr.begin() + high + 1);
     int pivot = select(temp, 0, temp.size() - 1, (temp.size() + 1) / 2);
 
-    // Find actual pivot index in original array
     int pivotIndex = -1;
     for (int i = low; i <= high; i++) {
         if (arr[i] == pivot) {
@@ -49,7 +45,7 @@ int partition(vector<int>& arr, int low, int high) {
         exit(1);
     }
 
-    swap_keys(arr, pivotIndex, high); // move pivot to end
+    swap_keys(arr, pivotIndex, high);
     int i = low - 1;
     for (int j = low; j < high; j++) {
         if (compare(arr[j], pivot)) {
@@ -60,24 +56,6 @@ int partition(vector<int>& arr, int low, int high) {
     swap_keys(arr, i + 1, high);
     return i + 1;
 }
-
-
-// int partition(vector<int>& arr, int low, int high) {
-//     // int pivot = arr[high];
-//     int pivot = select(arr, low, high, (high - low + 2) / 2);
-
-//     // vector<int> temp(arr.begin() + low, arr.begin() + high + 1);
-//     // int pivot = select(temp, 0, temp.size() - 1, (temp.size() + 1) / 2);
-//     int i = low - 1;
-//     for (int j = low; j < high; j++) {
-//         if (compare(arr[j], pivot)) {
-//             i++;
-//             swap_keys(arr, i, j);
-//         }
-//     }
-//     swap_keys(arr, i + 1, high);
-//     return i + 1;
-// }
 
 void quickSort(vector<int>& arr, int low, int high) {
     if (low < high) {

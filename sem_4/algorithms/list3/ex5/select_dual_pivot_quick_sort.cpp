@@ -1,4 +1,3 @@
-// dual_pivot_quick_sort.cpp
 #include "select.hpp"
 #include <iostream>
 #include <vector>
@@ -33,13 +32,12 @@ bool is_sorted(const vector<int>& A) {
 
 void dualPivotPartition(vector<int>& A, int low, int high, int& lp, int& rp) {
     int len = high - low + 1;
-    // 1) Wybór pivotów na kopii, by nie mutować A
+    
     vector<int> tmp(A.begin() + low, A.begin() + high + 1);
     int p = select(tmp, 0, len - 1, (len + 2) / 3);
     int q = select(tmp, 0, len - 1, 2 * (len + 1) / 3);
     if (p > q) std::swap(p, q);
 
-    // 2) Znalezienie i przeniesienie pivotów do A[low], A[high]
     int pIndex = -1, qIndex = -1;
     for (int i = low; i <= high; ++i) {
         if (A[i] == p && pIndex < 0) pIndex = i;
@@ -50,26 +48,23 @@ void dualPivotPartition(vector<int>& A, int low, int high, int& lp, int& rp) {
         exit(1);
     }
     swap_keys(A, low,  pIndex);
-    // jeśli pivot1 był na high, to teraz się przeniósł na pIndex
+    
     if (qIndex == low) qIndex = pIndex;
     swap_keys(A, high, qIndex);
 
-    // 3) Odczyt pivotów w nowych pozycjach
     p = A[low];
     q = A[high];
 
-    // 4) Trójpodział z count-based strategią
     int lt = low + 1, i = low + 1, gt = high - 1;
     int small_count = 0, large_count = 0;
 
     while (i <= gt) {
         if (large_count > small_count) {
-            // najpierw duże przestawienia
-            if (compare(q, A[i])) {              // A[i] > q?
+            if (compare(q, A[i])) {
                 swap_keys(A, i, gt--);
                 large_count++;
             }
-            else if (compare(A[i], p)) {         // A[i] < p?
+            else if (compare(A[i], p)) {
                 swap_keys(A, i, lt++);
                 small_count++;
                 i++;
@@ -78,13 +73,12 @@ void dualPivotPartition(vector<int>& A, int low, int high, int& lp, int& rp) {
                 i++;
             }
         } else {
-            // najpierw małe przestawienia
-            if (compare(A[i], p)) {             // A[i] < p?
+            if (compare(A[i], p)) {
                 swap_keys(A, i, lt++);
                 small_count++;
                 i++;
             }
-            else if (compare(q, A[i])) {        // A[i] > q?
+            else if (compare(q, A[i])) {
                 swap_keys(A, i, gt--);
                 large_count++;
             }
@@ -94,13 +88,11 @@ void dualPivotPartition(vector<int>& A, int low, int high, int& lp, int& rp) {
         }
     }
 
-    // 5) Przeniesienie pivotów do pozycji lt-1 i gt+1
     swap_keys(A, low,  --lt);
     swap_keys(A, high, ++gt);
     lp = lt;
     rp = gt;
 
-    // debug dla małych n
     if (len < 40) {
         cout << "After partition [" << low << "," << high
              << "] — lp=" << lp << ", rp=" << rp << ": ";
