@@ -116,13 +116,13 @@ procedure Travelers is
   end Printer;
 
   -- Travelers
-  type Kind_Of_Traveler is (Normal, Wild, Trap, Empty);
-
   type Traveler_Type is record
     Id       : Integer;
     Symbol   : Character;
     Position : Position_Type;
   end record;
+
+  type Kind_Of_Traveler is (Normal, Wild, Trap, Empty);
 
   -- Task types
   type Response_Type is (Success, Fail, Trap, Deadlock);
@@ -169,7 +169,7 @@ procedure Travelers is
     Position : Position_Type;
   end Cell;
 
-  -- Global objects
+  -- Objects
   Board : array (0 .. Board_Width - 1, 0 .. Board_Height - 1) of Cell;
   Travel_Tasks : array (0 .. Nr_Of_Travelers + Nr_Of_Wild_Travelers + Nr_Of_Traps - 1) of access General_Traveler_Task_Type;
   Null_Task : constant access General_Traveler_Task_Type := new General_Traveler_Task_Type(Kind => Empty);
@@ -349,7 +349,7 @@ procedure Travelers is
   begin
     accept Init(Id : Integer; Seed : Integer; Symbol : Character) do
       Reset(G, Seed);
-      Time_Emerge := (((Max_Delay + Min_Delay) / 2) * Max_Steps) * Duration(Random(G));
+      Time_Emerge := (((Max_Delay + Min_Delay) / 2) * ((Max_Steps + Min_Steps) / 2)) * Duration(Random(G));
       Time_Vanish := Time_Emerge + (Max_Delay * Max_Steps - Time_Emerge) * Duration(Random(G));
       Traveler := Travel_Tasks(Id).Traveler'Access;
       Traveler.Id := Id;
@@ -491,6 +491,7 @@ procedure Travelers is
 
   Symbol : Character;
   Id : Integer;
+
 begin
   Put_Line(
     "-1 " &

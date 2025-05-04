@@ -10,7 +10,6 @@ import (
 const (
 	NrOfTravelers     = 15
 	NrOfWildTravelers = 10
-	NrOfTraps         = 10
 	MinSteps          = 10
 	MaxSteps          = 100
 	MinDelay          = 10 * time.Millisecond
@@ -78,8 +77,8 @@ func Print_Traces(traces []Trace) {
 }
 
 type Printer struct {
-	TraceChannel  chan []Trace
-	Done          chan bool
+	TraceChannel chan []Trace
+	Done         chan bool
 }
 
 func (p *Printer) Start() {
@@ -88,13 +87,6 @@ func (p *Printer) Start() {
 
 	go func() {
 		for i := 0; i < NrOfTravelers+NrOfWildTravelers; i++ {
-			traces := <-p.TraceChannel
-			Print_Traces(traces)
-		}
-
-		p.Done <- true
-
-		for i := 0; i < NrOfTraps; i++ {
 			traces := <-p.TraceChannel
 			Print_Traces(traces)
 		}
@@ -114,7 +106,6 @@ type Response int
 const (
 	Success Response = iota
 	Fail
-	Trapped
 	Deadlock
 )
 
@@ -130,44 +121,32 @@ type Traveler struct {
 
 type Normal struct {
 	Traveler
-	steps int
+	steps     int
 }
 
 type RelocateRequest struct {
-	Position Position
-	Status   Response
+	Position  Position
+	Status    Response
 }
 type Wild struct {
 	Traveler
 	RelocateChannel chan RelocateRequest
 
-	timeEmerge  time.Duration
-	timeVanish  time.Duration
-}
-
-type TrapRequest struct {
-	Traveler        GeneralTraveler
-	ResponseChannel chan Response
-}
-type Trap struct {
-	Traveler
-	TrapChannel chan TrapRequest
-	Done        chan bool
-
-	traveler GeneralTraveler
+	timeEmerge    time.Duration
+	timeVanish    time.Duration
 }
 
 type AcquireRequest struct {
-	Traveler        GeneralTraveler
-	ResponseChannel chan Response
+	Traveler         GeneralTraveler
+	ResponseChannel  chan Response
 }
 type Cell struct {
-	AcquireChannel chan AcquireRequest
-	LeaveChannel chan bool
+	AcquireChannel  chan AcquireRequest
+	LeaveChannel    chan bool
 
 	position Position
-	traveler GeneralTraveler
-	waiting  []AcquireRequest
+	traveler  GeneralTraveler
+	waiting   []AcquireRequest
 }
 
 func (n *Cell) Init(position Position) {
@@ -208,9 +187,7 @@ func (n *Cell) Start() {
 						}
 
 						if cellResponse != Fail {
-							if cellResponse != Trapped {
-								wild.RelocateChannel <- RelocateRequest{newPosition, Success}
-							}
+							wild.RelocateChannel <- RelocateRequest{newPosition, Success}
 							n.traveler = Request.Traveler
 							Request.ResponseChannel <- Success
 						} else {
@@ -219,8 +196,6 @@ func (n *Cell) Start() {
 					} else {
 						Request.ResponseChannel <- Fail
 					}
-				} else if trap, ok := n.traveler.(*Trap); ok {
-					trap.TrapChannel <- TrapRequest{Request.Traveler, Request.ResponseChannel}
 				} else {
 					Request.ResponseChannel <- Fail
 				}
@@ -257,13 +232,6 @@ func (t *Normal) Init(id int, symbol rune) {
 		t.response = <-request.ResponseChannel
 	}
 
-	if t.response == Trapped {
-		t.Position = Position{
-			X: BoardWidth,
-			Y: BoardHeight,
-		}
-	}
-
 	t.timeStamp = time.Since(StartTime)
 	t.Store_Trace()
 }
@@ -271,7 +239,7 @@ func (t *Normal) Init(id int, symbol rune) {
 func (t *Normal) Start() {
 	go func() {
 		for i := 0; i < t.steps; i++ {
-			if t.response == Trapped || t.response == Deadlock {
+			if t.response == Deadlock {
 				break
 			}
 			time.Sleep(MinDelay + time.Duration(rand.Int63n(int64(MaxDelay-MinDelay))))
@@ -310,12 +278,6 @@ func (t *Normal) Start() {
 			case Success:
 				Board[t.Position.X][t.Position.Y].LeaveChannel <- true
 				t.Position = newPosition
-			case Trapped:
-				Board[t.Position.X][t.Position.Y].LeaveChannel <- true
-				t.Position = Position{
-					X: BoardWidth,
-					Y: BoardHeight,
-				}
 			case Deadlock:
 				t.Symbol = unicode.ToLower(t.Symbol)
 			}
@@ -357,7 +319,7 @@ func (t *Wild) Start() {
 
 		t.RelocateChannel = make(chan RelocateRequest)
 		for true {
-			if t.response == Trapped || time.Since(StartTime) > t.timeVanish {
+			if time.Since(StartTime) > t.timeVanish {
 				break
 			}
 
@@ -371,97 +333,24 @@ func (t *Wild) Start() {
 			}
 		}
 
-		if t.response != Trapped {
-			Board[t.Position.X][t.Position.Y].LeaveChannel <- true
-			t.Position = Position{
-				X: BoardWidth,
-				Y: BoardHeight,
-			}
-			t.timeStamp = time.Since(StartTime)
-			t.Store_Trace()
-		}
-
-		printer.TraceChannel <- t.traces
-	}()
-}
-
-func (t *Trap) Init(id int, symbol rune) {
-	t.TrapChannel = make(chan TrapRequest, 4)
-	t.Done = make(chan bool)
-	t.Id = id
-	t.Symbol = '#'
-	t.traveler = nil
-
-	t.response = Fail
-	for t.response == Fail {
+		Board[t.Position.X][t.Position.Y].LeaveChannel <- true
 		t.Position = Position{
-			X: rand.Intn(BoardWidth),
-			Y: rand.Intn(BoardHeight),
+			X: BoardWidth,
+			Y: BoardHeight,
 		}
-
-		request := AcquireRequest{t, make(chan Response, 1)}
-		Board[t.Position.X][t.Position.Y].AcquireChannel <- request
-		t.response = <-request.ResponseChannel
-	}
-
-	t.timeStamp = time.Since(StartTime)
-	t.Store_Trace()
-
-	t.Start()
-}
-
-func (t *Trap) Start() {
-	go func() {
-		for true {
-			if t.response == Deadlock {
-				break
-			}
-
-			select {
-			case Request := <-t.TrapChannel:
-				switch v := Request.Traveler.(type) {
-				case *Normal:
-					t.response = Trapped
-					t.Symbol = unicode.ToLower(v.Symbol)
-				case *Wild:
-					select {
-					case v.RelocateChannel <- RelocateRequest{Position{BoardWidth, BoardHeight}, Trapped}:
-						t.response = Trapped
-						t.Symbol = '*'
-					case <-time.After(100 * time.Millisecond):
-						t.response = Fail
-					}
-				default:
-					t.response = Fail
-				}
-
-				Request.ResponseChannel <- t.response
-
-				if t.response == Trapped {
-					t.timeStamp = time.Since(StartTime)
-					t.Store_Trace()
-
-					time.Sleep(2 * MaxDelay)
-
-					t.Symbol = '#'
-					t.timeStamp = time.Since(StartTime)
-					t.Store_Trace()
-				}
-			case <-t.Done:
-				t.response = Deadlock
-			}
-		}
+		t.timeStamp = time.Since(StartTime)
+		t.Store_Trace()
 
 		printer.TraceChannel <- t.traces
 	}()
 }
 
 func main() {
-	var travelers [NrOfTraps + NrOfTravelers + NrOfWildTravelers]GeneralTraveler
+	var travelers [NrOfTravelers + NrOfWildTravelers]GeneralTraveler
 
 	fmt.Printf(
 		"-1 %d %d %d\n",
-		NrOfTraps+NrOfTravelers+NrOfWildTravelers,
+		NrOfTravelers+NrOfWildTravelers,
 		BoardWidth,
 		BoardHeight,
 	)
@@ -475,12 +364,6 @@ func main() {
 	}
 
 	id := 0
-	for i := 0; i < NrOfTraps; i++ {
-		travelers[id] = &Trap{}
-		travelers[id].Init(id, '#')
-		id++
-	}
-
 	symbol := 'A'
 	for i := 0; i < NrOfTravelers; i++ {
 		travelers[id] = &Normal{}
@@ -497,7 +380,7 @@ func main() {
 		symbol++
 	}
 
-	id = NrOfTraps
+	id = 0
 	for i := 0; i < NrOfTravelers; i++ {
 		travelers[id].Start()
 		id++
@@ -506,13 +389,6 @@ func main() {
 	for i := 0; i < NrOfWildTravelers; i++ {
 		travelers[id].Start()
 		id++
-	}
-
-	<-printer.Done
-
-	for i := 0; i < NrOfTraps; i++ {
-		trap, _ := travelers[i].(*Trap)
-		trap.Done <- true
 	}
 
 	<-printer.Done

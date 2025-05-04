@@ -105,13 +105,13 @@ procedure Travelers is
   end Printer;
 
   -- Travelers
-  type Kind_Of_Traveler is (Normal, Wild, Empty);
-
   type Traveler_Type is record
     Id       : Integer;
     Symbol   : Character;
     Position : Position_Type;
   end record;
+
+  type Kind_Of_Traveler is (Normal, Wild, Empty);
 
   -- Task types
   task type Traveler_Task_Type is
@@ -147,7 +147,7 @@ procedure Travelers is
     Position : Position_Type;
   end Cell;
 
-  -- Global objects
+  -- Objects
   Board : array (0 .. Board_Width - 1, 0 .. Board_Height - 1) of Cell;
   Travel_Tasks : array (0 .. Nr_Of_Travelers + Nr_Of_Wild_Travelers - 1) of access General_Traveler_Task_Type;
   Empty_Task : access General_Traveler_Task_Type := new General_Traveler_Task_Type(Kind => Empty);
@@ -324,7 +324,7 @@ procedure Travelers is
       Reset(G, Seed);
       Traveler.Id := Id;
       Traveler.Symbol := Symbol;
-      Time_Emerge := (((Max_Delay + Min_Delay) / 2) * Max_Steps) * Duration(Random(G));
+      Time_Emerge := (((Max_Delay + Min_Delay) / 2) * ((Max_Steps + Min_Steps) / 2)) * Duration(Random(G));
       Time_Vanish := Time_Emerge + (Max_Delay * Max_Steps - Time_Emerge) * Duration(Random(G));
     end Init;
 
@@ -374,6 +374,7 @@ procedure Travelers is
 
   Symbol : Character;
   Id : Integer;
+
 begin
   Put_Line(
     "-1 " &
