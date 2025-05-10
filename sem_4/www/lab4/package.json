@@ -1,0 +1,23 @@
+{
+    "name": "event-api",
+    "version": "1.0.0",
+    "description": "REST API with MongoDB for events, users and comments",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js",
+        "dev": "nodemon server.js"
+    },
+    "dependencies": {
+        "bcryptjs": "^2.4.3",
+        "dotenv": "^16.5.0",
+        "event-api": "file:",
+        "eventdb": "file:",
+        "express": "^4.21.2",
+        "jsonwebtoken": "^9.0.0",
+        "mongodb": "^6.16.0",
+        "mongoose": "^7.8.7"
+    },
+    "devDependencies": {
+        "nodemon": "^3.1.0"
+    }
+}
