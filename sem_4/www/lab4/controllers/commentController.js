@@ -14,9 +14,11 @@ exports.createComment = async (req, res, next) => {
   }
 };
 
-exports.getComments = async (req, res, next) => {
+exports.getCommentsForEvent = async (req, res, next) => {
   try {
-    const comments = await Comment.find().populate('event').populate('author');
+    const comments = await Comment.find({ event: req.params.eventId })
+      .populate('event')
+      .populate('author');
     res.json(comments);
   } catch (err) {
     next(err);
