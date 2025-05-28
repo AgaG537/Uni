@@ -223,7 +223,7 @@ int BST::height() {
             }
         }
     }
-    return h;
+    return h + 1;
 }
 
 void BST::print_tree_recursive(Node* node, const std::string& prefix, bool isLeft) {

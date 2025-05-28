@@ -433,7 +433,7 @@ int RBTree::height() {
             }
         }
     }
-    return h;
+    return h + 1;
 }
 
 void RBTree::print_tree_recursive(RBNode* node, const std::string& prefix, bool isLeft) {

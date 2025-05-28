@@ -35,7 +35,7 @@ void run_task5_scenario(int n, bool ascending_insert) {
 }
 
 int main() {
-    const int n_task5 = 30;
+    const int n_task5 = 10;
 
     // Scenario 1: Insert ascending sequence, delete random permutation
     run_task5_scenario(n_task5, true);

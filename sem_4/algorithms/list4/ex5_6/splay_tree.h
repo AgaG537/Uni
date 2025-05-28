@@ -337,7 +337,7 @@ int SplayTree::height() {
             }
         }
     }
-    return h;
+    return h + 1;
 }
 
 void SplayTree::print_tree_recursive(SplayNode* node, const std::string& prefix, bool isLeft) {
