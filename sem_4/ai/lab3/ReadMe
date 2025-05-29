@@ -1,0 +1,31 @@
+Original Author: Maciej Gębala
+Modified by Agnieszka Głuszkiewicz for educational purposes.
+
+Files:
+
+Makefile
+board.h         // game rules and board handling
+game_server.c   // game server
+game_client.c   // game client for human players
+minimax_bot.c // game bot using the Minimax algorithm with Alpha-Beta pruning
+
+Compiler: gcc version 13.3.0
+Library: gsl 2.7 (my_minimax_bot - random number generator)
+
+
+Server Execution:
+
+./game_server <ip_address> <port_number>
+
+Human Client Execution:
+
+./game_client <ip_address> <port_number> <player_number> <nickname>
+
+Minimax Bot Execution:
+
+./minimax_bot <ip_address> <port_number> <player_number> <nickname> <search_depth>
+
+
+player_number: 1 for X or 2 for O.
+nickname: player identifier (name) (up to 9 characters)
+search_depth: depth for the Minimax algorithm's search (integer from 1 to 10)
