@@ -1,0 +1,146 @@
+--- Loading and preparing MNIST data ---
+Shape of original data after flattening and normalization: (60000, 784)
+Shape of labels: (60000,)
+
+--- Performing Dimensionality Reduction (PCA + t-SNE) ---
+Shape after PCA: (60000, 50)
+Shape after t-SNE: (60000, 2)
+
+
+--- Running DBSCAN with eps=2.0, min_samples=11 ---
+Number of clusters: 26
+Noise ratio: 0.0081
+Homogeneity: 0.8845
+Completeness: 0.9193
+V-measure: 0.9015
+Adjusted Rand Index (ARI): 0.8525
+Fowlkes-Mallows Score: 0.8713
+
+
+--- Cluster to Digit Mapping ---
+Cluster 0 => Assigned Digit: 5
+Cluster 1 => Assigned Digit: 0
+Cluster 2 => Assigned Digit: 4
+Cluster 3 => Assigned Digit: 1
+Cluster 4 => Assigned Digit: 2
+Cluster 5 => Assigned Digit: 3
+Cluster 6 => Assigned Digit: 6
+Cluster 7 => Assigned Digit: 7
+Cluster 8 => Assigned Digit: 8
+Cluster 9 => Assigned Digit: 1
+Cluster 10 => Assigned Digit: 3
+Cluster 11 => Assigned Digit: 7
+Cluster 12 => Assigned Digit: 3
+Cluster 13 => Assigned Digit: 1
+Cluster 14 => Assigned Digit: 1
+Cluster 15 => Assigned Digit: 2
+Cluster 16 => Assigned Digit: 3
+Cluster 17 => Assigned Digit: 9
+Cluster 18 => Assigned Digit: 9
+Cluster 19 => Assigned Digit: 7
+Cluster 20 => Assigned Digit: 5
+Cluster 21 => Assigned Digit: 3
+Cluster 22 => Assigned Digit: 8
+Cluster 23 => Assigned Digit: 6
+Cluster 24 => Assigned Digit: 5
+Cluster 25 => Assigned Digit: 8
+
+
+'Classification' Accuracy (only for clustered points): 0.8824
+Number of correctly clustered points: 52514
+Total number of clustered (non-noise) points: 59514
+Total number of points in the dataset: 60000
+
+--- Digit Distribution in Clusters (top 3 most frequent digits) ---
+Cluster 0 (assigned to digit 5, Total points: 5476):
+  Digit 5: 5210 (95.14%)
+  Digit 3: 171 (3.12%)
+  Digit 8: 53 (0.97%)
+Cluster 1 (assigned to digit 0, Total points: 5923):
+  Digit 0: 5861 (98.95%)
+  Digit 2: 19 (0.32%)
+  Digit 9: 13 (0.22%)
+Cluster 2 (assigned to digit 4, Total points: 11627):
+  Digit 4: 5764 (49.57%)
+  Digit 9: 5698 (49.01%)
+  Digit 7: 56 (0.48%)
+Cluster 3 (assigned to digit 1, Total points: 6596):
+  Digit 1: 6479 (98.23%)
+  Digit 7: 35 (0.53%)
+  Digit 8: 26 (0.39%)
+Cluster 4 (assigned to digit 2, Total points: 5828):
+  Digit 2: 5733 (98.37%)
+  Digit 3: 31 (0.53%)
+  Digit 1: 26 (0.45%)
+Cluster 5 (assigned to digit 3, Total points: 5714):
+  Digit 3: 5613 (98.23%)
+  Digit 9: 44 (0.77%)
+  Digit 8: 33 (0.58%)
+Cluster 6 (assigned to digit 6, Total points: 5960):
+  Digit 6: 5841 (98.00%)
+  Digit 5: 54 (0.91%)
+  Digit 8: 19 (0.32%)
+Cluster 7 (assigned to digit 7, Total points: 6242):
+  Digit 7: 6081 (97.42%)
+  Digit 2: 63 (1.01%)
+  Digit 9: 42 (0.67%)
+Cluster 8 (assigned to digit 8, Total points: 5662):
+  Digit 8: 5534 (97.74%)
+  Digit 3: 71 (1.25%)
+  Digit 9: 26 (0.46%)
+Cluster 9 (assigned to digit 1, Total points: 146):
+  Digit 1: 122 (83.56%)
+  Digit 2: 12 (8.22%)
+  Digit 9: 4 (2.74%)
+Cluster 10 (assigned to digit 3, Total points: 20):
+  Digit 3: 17 (85.00%)
+  Digit 2: 3 (15.00%)
+Cluster 11 (assigned to digit 7, Total points: 11):
+  Digit 7: 9 (81.82%)
+  Digit 5: 2 (18.18%)
+Cluster 12 (assigned to digit 3, Total points: 80):
+  Digit 3: 61 (76.25%)
+  Digit 5: 13 (16.25%)
+  Digit 2: 3 (3.75%)
+Cluster 13 (assigned to digit 1, Total points: 11):
+  Digit 1: 8 (72.73%)
+  Digit 4: 3 (27.27%)
+Cluster 14 (assigned to digit 1, Total points: 42):
+  Digit 1: 42 (100.00%)
+Cluster 15 (assigned to digit 2, Total points: 25):
+  Digit 2: 21 (84.00%)
+  Digit 9: 1 (4.00%)
+  Digit 8: 1 (4.00%)
+Cluster 16 (assigned to digit 3, Total points: 15):
+  Digit 3: 11 (73.33%)
+  Digit 1: 3 (20.00%)
+  Digit 9: 1 (6.67%)
+Cluster 17 (assigned to digit 9, Total points: 16):
+  Digit 9: 13 (81.25%)
+  Digit 3: 2 (12.50%)
+  Digit 7: 1 (6.25%)
+Cluster 18 (assigned to digit 9, Total points: 28):
+  Digit 9: 22 (78.57%)
+  Digit 3: 4 (14.29%)
+  Digit 8: 1 (3.57%)
+Cluster 19 (assigned to digit 7, Total points: 16):
+  Digit 7: 14 (87.50%)
+  Digit 9: 1 (6.25%)
+  Digit 4: 1 (6.25%)
+Cluster 20 (assigned to digit 5, Total points: 12):
+  Digit 5: 12 (100.00%)
+Cluster 21 (assigned to digit 3, Total points: 25):
+  Digit 8: 11 (44.00%)
+  Digit 3: 11 (44.00%)
+  Digit 2: 2 (8.00%)
+Cluster 22 (assigned to digit 8, Total points: 11):
+  Digit 8: 10 (90.91%)
+  Digit 4: 1 (9.09%)
+Cluster 23 (assigned to digit 6, Total points: 10):
+  Digit 6: 8 (80.00%)
+  Digit 5: 2 (20.00%)
+Cluster 24 (assigned to digit 5, Total points: 11):
+  Digit 5: 10 (90.91%)
+  Digit 9: 1 (9.09%)
+Cluster 25 (assigned to digit 8, Total points: 7):
+  Digit 8: 7 (100.00%)
