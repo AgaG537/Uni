@@ -21,14 +21,20 @@ exports.login = async (req, res, next) => {
       }
     );
 
+    // Set cookie (for web browser clients)
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production', // HTTPS only in production
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'Strict',
       maxAge: 24 * 60 * 60 * 1000 // 1 day
     });
 
-    res.status(200).json({ message: 'Logged in successfully' });
+    // Also return the token for API clients like Flutter
+    res.status(200).json({ 
+      message: 'Logged in successfully',
+      token: token,
+      user: { id: user._id, username: user.username, role: user.role }
+    });
   } catch (err) {
     next(err);
   }
