@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:event_app/providers/auth_provider.dart';
+import 'package:event_app/widgets/google_button.dart';
 
 class AuthScreen extends StatefulWidget {
   final bool isLogin;
@@ -16,6 +20,78 @@ class _AuthScreenState extends State<AuthScreen> {
   String _username = '';
   String _password = '';
   bool _isLoading = false;
+
+  static const String WEB_CLIENT_ID = '177058997845-uje3qbrcj2tkp4av5f8o39r35tk907ai.apps.googleusercontent.com';
+
+  late final GoogleSignIn _googleSignIn = GoogleSignIn(
+    clientId: kIsWeb ? WEB_CLIENT_ID : null,
+    serverClientId: !kIsWeb ? WEB_CLIENT_ID : null,
+    scopes: ['email'],
+  );
+
+  @override
+  void initState() {
+    super.initState();
+    // Web-only: listen for the sign-in result
+    if (kIsWeb) {
+      _googleSignIn.onCurrentUserChanged.listen((account) async {
+        if (account != null) {
+          setState(() => _isLoading = true);
+          try {
+            final googleAuth = await account.authentication;
+            final String? idToken = googleAuth.idToken;
+            if (idToken == null) {
+              throw Exception('No ID token from Google on web.');
+            }
+            final authProvider = Provider.of<AuthProvider>(context, listen: false);
+            await authProvider.loginWithGoogle(idToken);
+            if (!mounted) return;
+            context.go('/');
+          } catch (e) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Google Sign-In error: ${e.toString()}')),
+            );
+          } finally {
+            if (mounted) setState(() => _isLoading = false);
+          }
+        }
+      });
+    }
+  }
+
+
+  Future<void> _handleGoogleSignIn() async {
+    setState(() => _isLoading = true);
+    try {
+      final account = await _googleSignIn.signIn();
+      if (account == null) {
+        // User cancelled the sign-in process
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      final googleAuth = await account.authentication;
+      final String? idToken = googleAuth.idToken;
+
+      if (idToken == null) {
+        throw Exception('No ID token from Google.');
+      }
+
+      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+      await authProvider.loginWithGoogle(idToken);
+
+      if (!mounted) return;
+      context.go('/');
+
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google Sign-In failed: ${e.toString()}')),
+      );
+    } finally {
+      setState(() => _isLoading = false);
+    }
+  }
+
 
   Future<void> _submitAuthForm() async {
     if (!_formKey.currentState!.validate()) {
@@ -182,6 +258,12 @@ class _AuthScreenState extends State<AuthScreen> {
                               style: const TextStyle(fontSize: 16),
                             ),
                           ),
+                          const SizedBox(height: 20),
+                          const Text('OR'),
+                          const SizedBox(height: 10),
+                          _isLoading
+                              ? const CircularProgressIndicator()
+                              : buildGoogleSignInButton(_handleGoogleSignIn),
                         ],
                       ),
                     ),

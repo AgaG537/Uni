@@ -9,6 +9,13 @@ import 'package:event_app/providers/comment_provider.dart';
 import 'package:event_app/providers/user_provider.dart';
 import 'package:event_app/routes/app_router.dart';
 
+// WEB:
+// flutter run -d chrome --web-port=5000
+
+// ANDROID:
+// set up device
+// flutter run --web-port=5000
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");

@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:event_app/api/api_service.dart';
 import 'package:event_app/models/user.dart';
 
@@ -8,6 +8,7 @@ class AuthProvider with ChangeNotifier {
   User? _user;
   String? _token;
   bool _isLoading = true;
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
 
   User? get user => _user;
   String? get token => _token;
@@ -20,9 +21,9 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> _loadUserFromPrefs() async {
-    final prefs = await SharedPreferences.getInstance();
-    _token = prefs.getString('jwt_token');
-    final userJson = prefs.getString('user_data');
+    _token = await _storage.read(key: 'jwt_token');
+    final userJson = await _storage.read(key: 'user_data');
+
     if (_token != null && userJson != null) {
       _user = User.fromJson(json.decode(userJson));
     }
@@ -43,9 +44,31 @@ class AuthProvider with ChangeNotifier {
       _token = responseBody['token'];
       _user = User.fromJson(responseBody['user']);
 
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('jwt_token', _token!);
-      await prefs.setString('user_data', json.encode(_user!.toJson()));
+      await _storage.write(key: 'jwt_token', value: _token!);
+      await _storage.write(key: 'user_data', value: json.encode(_user!.toJson()));
+
+      _isLoading = false;
+      notifyListeners();
+    } catch (e) {
+      _token = null;
+      _user = null;
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
+  }
+
+  // New Google Login method
+  Future<void> loginWithGoogle(String idToken) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final result = await ApiService.loginWithGoogle(idToken);
+      _token = result['token'];
+      _user = User.fromJson(result['user']);
+
+      await _storage.write(key: 'jwt_token', value: _token!);
+      await _storage.write(key: 'user_data', value: json.encode(_user!.toJson()));
 
       _isLoading = false;
       notifyListeners();
@@ -73,9 +96,8 @@ class AuthProvider with ChangeNotifier {
         _token = responseBody['token'];
         _user = User.fromJson(responseBody['user']);
 
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('jwt_token', _token!);
-        await prefs.setString('user_data', json.encode(_user!.toJson()));
+        await _storage.write(key: 'jwt_token', value: _token!);
+        await _storage.write(key: 'user_data', value: json.encode(_user!.toJson()));
       }
 
       _isLoading = false;
@@ -90,9 +112,8 @@ class AuthProvider with ChangeNotifier {
   Future<void> logout() async {
     _user = null;
     _token = null;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt_token');
-    await prefs.remove('user_data');
+    await _storage.delete(key: 'jwt_token');
+    await _storage.delete(key: 'user_data');
     notifyListeners();
   }
 }
