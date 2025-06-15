@@ -26,11 +26,7 @@ procedure  Mutex_Template is
     Entry_Protocol_4,
     Critical_Section,
     Exit_Protocol
-    );
-
--- Flags
-
-   Flags : array(0 .. Nr_Of_Processes - 1) of Integer range 0..4 := (others => 0);
+  );
 
 -- 2D Board display board
 
@@ -122,6 +118,72 @@ procedure  Mutex_Template is
 
   end Printer;
 
+  type Int_Array is array (0 .. Nr_Of_Processes-1) of Integer
+    with Atomic_Components => True;
+
+  Flag : Int_Array  := (others => 0);
+
+   type Allowed_Flags is array (Positive range <>) of Integer;
+
+
+  function All_Flags_In(First_Index : Integer; Last_Index : Integer;
+                           Set_Allowed : Allowed_Flags)  return Boolean is
+   begin
+      if Last_Index <= First_Index then
+         return True;
+      end if;
+      for I in First_Index .. Last_Index-1 loop
+         declare
+            V : Integer := Flag(I);
+            In_Set : Boolean := False;
+         begin
+            for J in Set_Allowed'Range loop
+               if V = Set_Allowed(J) then
+                  In_Set := True;
+                  exit;
+               end if;
+            end loop;
+            if not In_Set then
+               return False;
+            end if;
+         end;
+      end loop;
+      return True;
+   end All_Flags_In;
+
+
+   procedure Wait_All_Flags_In(First_Index : Integer; Last_Index : Integer;
+                           Set_Allowed : Allowed_Flags) is
+      begin
+         loop
+            exit when All_Flags_In(First_Index, Last_Index, Set_Allowed);
+            delay 0.01;
+         end loop;
+      end Wait_All_Flags_In;
+
+   function Any_Flag_In(Set_Allowed : Integer) return Boolean is
+   begin
+      for I in Flag'Range loop
+         declare
+            V : Integer := Flag(I);
+         begin
+            if V = Set_Allowed then
+               return True;
+            end if;
+         end;
+      end loop;
+      return False;
+   end Any_Flag_In;
+
+   procedure Wait_Any_Flag_In(Set_Allowed: Integer) is
+      begin
+         loop
+            exit when Any_Flag_In(Set_Allowed);
+            delay 0.01;
+         end loop;
+      end Wait_Any_Flag_In;
+
+
 
   -- Processes
   type Process_Type is record
@@ -142,7 +204,6 @@ procedure  Mutex_Template is
     Time_Stamp : Duration;
     Nr_of_Steps: Integer;
     Traces: Traces_Sequence_Type; 
-    Condition: Boolean;
 
     procedure Store_Trace is
     begin  
@@ -191,57 +252,23 @@ procedure  Mutex_Template is
       delay Min_Delay+(Max_Delay-Min_Delay)*Duration(Random(G));
       -- LOCAL_SECTION - end
 
-      Change_State( ENTRY_PROTOCOL_1 ); -- starting ENTRY_PROTOCOL
+      Change_State ( Entry_Protocol_1);
 
-      Flags(Process.Id) := 1;
-      Condition := False;
-      while not Condition loop
-         Condition := True;
-         for I in Flags'Range loop
-            if Flags(I) > 2 then
-               Condition := False;
-               exit;
-            end if;
-         end loop;
-      end loop;
+      Flag(Process.Id) := 1;
+      Wait_All_Flags_In(0, Nr_Of_Processes, (0,1,2));
 
-      Flags(Process.Id) := 3;
-      Change_State (Entry_Protocol_2);
+      Flag(Process.Id) := 3;
+      Change_State ( Entry_Protocol_2);
 
-      for I in Flags'Range loop
-         if Flags(I) = 1 then
-            Flags(Process.Id) := 2;
-            Change_State (Entry_Protocol_3);
-
-            Condition := False;
-            while not Condition loop
-               for I in Flags'Range loop
-                  if Flags(I) = 4 then
-                     Condition := True;
-                     exit;
-                  end if;
-               end loop;
-            end loop;
-            exit;
-         end if;
-      end loop;
-            
-      Flags(Process.Id) := 4;
-      Change_State (Entry_Protocol_4);
-
-      Condition := False;
-      if Process.Id /= 0 then 
-         while Condition = False loop
-            Condition := True;
-            for I in 0..Process.Id-1 loop
-               if Flags(I) > 1 then
-                  Condition := False;
-                  exit;
-               end if;
-            end loop;
-         end loop;
+      if Any_Flag_In(1) then
+         Flag(Process.Id) := 2;
+         Change_State (Entry_Protocol_3);
+         Wait_Any_Flag_In (4);
       end if;
-      
+
+      Flag(Process.Id) := 4;
+      Change_State (Entry_Protocol_4);
+      Wait_All_Flags_In (0, Process.Id, (0,1));
 
       Change_State( CRITICAL_SECTION ); -- starting CRITICAL_SECTION
 
@@ -251,18 +278,9 @@ procedure  Mutex_Template is
 
       Change_State( EXIT_PROTOCOL ); -- starting EXIT_PROTOCOL
       
-      Condition := False;
-      while not Condition loop
-         Condition := True;
-         for I in Process.Id+1..Nr_Of_Processes-1 loop
-            if Flags(I) = 2 or Flags(I) = 3 then
-               Condition := False;
-               exit;
-            end if;
-         end loop;
-      end loop;
+      Wait_All_Flags_In (First_Index => Process.Id+1, Last_Index => Nr_Of_Processes, Set_Allowed => (0,1,4));
+      Flag(Process.Id) := 0;
 
-      Flags(Process.Id) := 0;
       Change_State( LOCAL_SECTION ); -- starting LOCAL_SECTION      
     end loop;
     

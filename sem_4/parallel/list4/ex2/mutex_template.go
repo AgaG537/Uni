@@ -4,27 +4,24 @@ import (
 	"fmt"
 	"math/rand"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
 const (
-	NrOfProcesses = 15
+	Nr_Of_Processes int = 15
 
-	MinSteps = 50
-	MaxSteps = 100
+	Min_Steps int = 50
+	Max_Steps int = 100
 
-	MinDelay = 10 * time.Millisecond
-	MaxDelay = 50 * time.Millisecond
-
-	BoardWidth  = NrOfProcesses
-	BoardHeight = 7
+	Min_Delay time.Duration = 10000000
+	Max_Delay time.Duration = 50000000
 )
 
-type ProcessState int
+type Process_State int
 
-// --- Process States ---
 const (
-	LocalSection ProcessState = iota
+	LocalSection Process_State = iota
 	EntryProtocol1
 	EntryProtocol2
 	EntryProtocol3
@@ -33,191 +30,229 @@ const (
 	ExitProtocol
 )
 
-// --- Flags ---
-var Flags = [NrOfProcesses]int{}
+const Board_Width int = Nr_Of_Processes
+const Board_Height int = int(ExitProtocol) + 1
 
-// --- Data Structures ---
+var Start_Time = time.Now()
 
-type Position struct {
-	X int
-	Y int
+
+type Position_Type struct {
+	X, Y int
 }
 
-type Trace struct {
-	TimeStamp time.Duration
-	ID        int
-	Position  Position
-	Symbol    rune
+type Trace_Type struct {
+	Time_Stamp time.Duration
+	Id         int
+	Position   Position_Type
+	Symbol     rune
 }
 
-type TraceSequence struct {
-	Last       int
-	TraceArray [MaxSteps + 1]Trace
+type Trace_Array_type [Max_Steps + 1]Trace_Type
+
+type Traces_Sequence_Type struct {
+	Last        int
+	Trace_Array Trace_Array_type
 }
 
-func (p *Printer) PrintTrace(trace Trace) {
-	fmt.Printf("%.9f  %d  %d  %d  %c\n", float64(trace.TimeStamp.Nanoseconds())/1e9, trace.ID, trace.Position.X, trace.Position.Y, trace.Symbol)
+func Print_Trace(Trace Trace_Type) {
+	fmt.Printf(
+		"%.6f %d %d %d %c\n",
+		Trace.Time_Stamp.Seconds(),
+		Trace.Id,
+		Trace.Position.X,
+		Trace.Position.Y,
+		Trace.Symbol,
+	)
 }
 
-func (p *Printer) PrintTraces(traces TraceSequence) {
-	for i := 0; i <= traces.Last; i++ {
-		p.PrintTrace(traces.TraceArray[i])
+func Print_Traces(Traces Traces_Sequence_Type) {
+	for i := 0; i <= Traces.Last; i++ {
+		Print_Trace(Traces.Trace_Array[i])
 	}
-	p.ReturnedTraces++
+}
 
-	if p.ReturnedTraces == NrOfProcesses {
-		fmt.Printf("-1 %d %d %d ", NrOfProcesses, BoardWidth, BoardHeight)
-		fmt.Printf("LOCAL_SECTION;ENTRY_PROTOCOL_1;ENTRY_PROTOCOL_2;ENTRY_PROTOCOL_3;ENTRY_PROTOCOL_4;CRITICAL_SECTION;EXIT_PROTOCOL;EXTRA_LABEL;")
+func Printer(printerChan chan Traces_Sequence_Type, Wait_for_Finish *sync.WaitGroup) {
+	defer Wait_for_Finish.Done()
+	for i := 0; i < Nr_Of_Processes; i++ {
+		report := <-printerChan
+		Print_Traces(report)
+	}
+
+	fmt.Printf("-1 %d %d %d ", Nr_Of_Processes, Board_Width, Board_Height)
+
+	fmt.Printf("LocalSection;Entry_Protocol_1;Entry_Protocol_2;Entry_Protocol_3;Entry_Protocol_4;CriticalSection;ExitProtocol;EXTRA")
+
+}
+
+var Flag = [Nr_Of_Processes]int32{0}
+
+func contains(value int32, allowed []int32) bool {
+	for _, a := range allowed {
+		if value == a {
+			return true
+		}
+	}
+	return false
+}
+
+func AllFlagsIn(firstIndex, lastIndex int, allowed []int32) bool {
+	if lastIndex <= firstIndex {
+		return true
+	}
+	for i := firstIndex; i < lastIndex; i++ {
+		v := atomic.LoadInt32(&Flag[i])
+		if !contains(v, allowed) {
+			return false
+		}
+	}
+	return true
+}
+
+func WaitAllFlagsIn(firstIndex, lastIndex int, allowed []int32) {
+	for {
+		if AllFlagsIn(firstIndex, lastIndex, allowed) {
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 
-// --- Printer Task ---
-type Printer struct {
-	ReturnedTraces int
+func AnyFlagIn(allowed []int32) bool {
+	for i := 0; i < Nr_Of_Processes; i++ {
+		v := atomic.LoadInt32(&Flag[i])
+		if contains(v, allowed) {
+			return true
+		}
+	}
+	return false
 }
 
-type Process struct {
-	ID       int
+func WaitAnyFlagIn(allowed []int32) {
+	for {
+		if AnyFlagIn(allowed) {
+			return
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+}
+
+func SetFlag(idx int, value int32) {
+	atomic.StoreInt32(&Flag[idx], value)
+}
+
+type Process_Type struct {
+	Id       int
 	Symbol   rune
-	Position Position
+	Position Position_Type
 }
 
-func StoreTrace(timeStamp time.Duration, process *Process, traces *TraceSequence) {
-	traces.Last++
-	traces.TraceArray[traces.Last] = Trace{
-		TimeStamp: timeStamp,
-		ID:        process.ID,
-		Position:  process.Position,
-		Symbol:    process.Symbol,
-	}
+type Process_Task_Type struct {
+	Time_Stamp  time.Duration
+	Nr_of_Steps int
+	Traces      Traces_Sequence_Type
+	Process     Process_Type
 }
 
-func ChangeState(state ProcessState, StartTime time.Time, process *Process, traces *TraceSequence) {
-	timeStamp := time.Since(StartTime)
-	process.Position.Y = int(state)
-	StoreTrace(timeStamp, process, traces)
+func (t *Process_Task_Type) Init(Id int, Symbol rune, wg *sync.WaitGroup) {
+	t.Process.Id = Id
+	t.Process.Symbol = Symbol
+	t.Traces.Last = -1
+
+	t.Process.Position = Position_Type{X: Id, Y: int(LocalSection)}
+
+	t.Nr_of_Steps = Min_Steps + int(float64(Max_Steps-Min_Steps)*rand.Float64())
+	
+	t.Time_Stamp = time.Since(Start_Time)
+	t.Store_Trace()
+
+	defer wg.Done()
 }
 
-// --- Process Task ---
-func ProcessTask(id int, seed int64, symbol rune, StartTime time.Time, printer *Printer) {
-	G := rand.New(rand.NewSource(seed))
-	process := Process{
-		ID:       id,
-		Symbol:   symbol,
-		Position: Position{X: id, Y: int(LocalSection)},
-	}
-	traces := TraceSequence{Last: -1}
-
-	nrOfSteps := MinSteps + G.Intn(MaxSteps-MinSteps)
-	TimeStamp := time.Since(StartTime)
-	condition := false
-
-	StoreTrace(TimeStamp, &process, &traces)
-
-	for range nrOfSteps/7 - 1 {
+func (t *Process_Task_Type) Start(printerChan chan Traces_Sequence_Type, Wait_for_Finish *sync.WaitGroup) {
+	for step := 0; step < t.Nr_of_Steps/7; step++ {
+		
 		// LOCAL_SECTION - start
-		time.Sleep(MinDelay + time.Duration(G.Float64()*float64(MaxDelay-MinDelay)))
+		time.Sleep(Min_Delay + time.Duration(rand.Float64()*float64(Max_Delay-Min_Delay)))
 		// LOCAL_SECTION - end
 
-		ChangeState(EntryProtocol1, StartTime, &process, &traces) // starting ENTRY_PROTOCOL
+		t.Change_State(EntryProtocol1)
+		SetFlag(t.Process.Id, 1) // t wants to enter
+		WaitAllFlagsIn(0, Nr_Of_Processes, []int32{0, 1, 2})
 
-		Flags[id] = 1
-		condition = false
-		for !condition {
-			condition = true
-			for i := range NrOfProcesses {
-				if Flags[i] > 2 {
-					condition = false
-					break
-				}
-			}
+		SetFlag(t.Process.Id, 3) // t enters the waiting room
+		t.Change_State(EntryProtocol2)
+
+		if AnyFlagIn([]int32{1}) {
+			SetFlag(t.Process.Id, 2) // t waits for other process to enter waiting room
+			t.Change_State(EntryProtocol3)
+			WaitAnyFlagIn([]int32{4})
 		}
 
-		Flags[id] = 3
-		ChangeState(EntryProtocol2, StartTime, &process, &traces)
+		SetFlag(t.Process.Id, 4) // t is leaving the waitng room (entry door closed)
+		t.Change_State(EntryProtocol4)
+		// wait flags[0..t.Id-1] ∈ {0,1}
+		WaitAllFlagsIn(0, t.Process.Id, []int32{0, 1})
 
-		for i := range NrOfProcesses {
-			if Flags[i] == 1 {
-				Flags[id] = 2
-				ChangeState(EntryProtocol3, StartTime, &process, &traces)
-
-				condition = false
-				for !condition {
-					for i := range NrOfProcesses {
-						if Flags[i] == 4 {
-							condition = true
-							break
-						}
-					}
-				}
-				break
-			}
-		}
-
-		Flags[id] = 4
-		ChangeState(EntryProtocol4, StartTime, &process, &traces)
-
-		condition = false
-		for !condition {
-			condition = true
-			for i := range id {
-				if Flags[i] > 1 {
-					condition = false
-					break
-				}
-			}
-		}
-
-		ChangeState(CriticalSection, StartTime, &process, &traces) // starting CRITICAL_SECTION
+		t.Change_State(CriticalSection) // starting CRITICAL_SECTION
 
 		// CRITICAL_SECTION - start
-		time.Sleep(MinDelay + time.Duration(G.Float64()*float64(MaxDelay-MinDelay)))
+		time.Sleep(Min_Delay + time.Duration(rand.Float64()*float64(Max_Delay-Min_Delay)))
 		// CRITICAL_SECTION - end
 
-		ChangeState(ExitProtocol, StartTime, &process, &traces) // starting EXIT_PROTOCOL
-		condition = false
-		for !condition {
-			condition = true
-			for i := id + 1; i < NrOfProcesses; i++ {
-				if Flags[i] == 2 || Flags[i] == 3 {
-					condition = false
-					break
-				}
-			}
-		}
+		t.Change_State(ExitProtocol) // starting EXIT_PROTOCOL
 
-		Flags[id] = 0
-		ChangeState(LocalSection, StartTime, &process, &traces) // starting LOCAL_SECTION
+		// wait flags[t.Id+1..NrOfProcesses-1] ∈ {0,1,4}
+		WaitAllFlagsIn(t.Process.Id+1, Nr_Of_Processes, []int32{0, 1, 4})
+		SetFlag(t.Process.Id, 0)
+		time.Sleep(10)
+
+		t.Change_State(LocalSection) // starting LOCAL_SECTION
+
 	}
-
-	printer.PrintTraces(traces)
+	printerChan <- t.Traces
+	defer Wait_for_Finish.Done()
 }
 
-func GenerateSeeds(n int) []int64 {
-	seeds := make([]int64, n)
-	for i := range seeds {
-		seeds[i] = time.Now().UnixNano() + int64(i*1000)
-	}
-	return seeds
+func (t *Process_Task_Type) Change_State(State Process_State) {
+	t.Time_Stamp = time.Since(Start_Time)
+	t.Process.Position.Y = int(State)
+	t.Store_Trace()
 }
 
-// --- Main Program ---
+func (t *Process_Task_Type) Store_Trace() {
+	t.Traces.Last++
+	t.Traces.Trace_Array[t.Traces.Last] = Trace_Type{
+		Time_Stamp: t.Time_Stamp,
+		Id:         t.Process.Id,
+		Position:   t.Process.Position,
+		Symbol:     t.Process.Symbol,
+	}
+}
+
 func main() {
-	StartTime := time.Now()
-	seeds := GenerateSeeds(NrOfProcesses)
+	var Process_Tasks [Nr_Of_Processes]Process_Task_Type
+	var Symbol rune = 'A'
 
-	printer := &Printer{0}
+	printerChan := make(chan Traces_Sequence_Type, Nr_Of_Processes)
 
-	// Start traveler tasks
-	var wg sync.WaitGroup
-	for i := range NrOfProcesses {
-		wg.Add(1)
-		go func(id int, seed int64, symbol rune) {
-			defer wg.Done()
-			ProcessTask(id, seed, symbol, StartTime, printer)
-		}(i, seeds[i], rune('A'+i))
+	var Wait_to_Start sync.WaitGroup
+	var Wait_for_Finish sync.WaitGroup
+
+	for index := range Process_Tasks {
+		Wait_to_Start.Add(1)
+		go Process_Tasks[index].Init(index, Symbol, &Wait_to_Start)
+		Symbol++
 	}
 
-	// Wait until all tasks are finished
-	wg.Wait()
+	Wait_to_Start.Wait()
+
+	Wait_for_Finish.Add(1)
+	go Printer(printerChan, &Wait_for_Finish)
+
+	for index := range Process_Tasks {
+		Wait_for_Finish.Add(1)
+		go Process_Tasks[index].Start(printerChan, &Wait_for_Finish)
+	}
+
+	Wait_for_Finish.Wait()
 }
