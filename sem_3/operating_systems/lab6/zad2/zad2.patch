@@ -1,0 +1,130 @@
+diff --git a/Makefile b/Makefile
+index cc3a5c9..10de45a 100644
+--- a/Makefile
++++ b/Makefile
+@@ -187,6 +187,7 @@ UPROGS=\
+ 	_hello\
+ 	_testnewsyscalls\
+ 	_testvm\
++	_usedmemtest\
+ 
+ fs.img: mkfs README $(UPROGS)
+ 	./mkfs fs.img README $(UPROGS)
+diff --git a/proc.c b/proc.c
+index 8f2c633..a17ae83 100644
+--- a/proc.c
++++ b/proc.c
+@@ -535,3 +535,11 @@ procdump(void)
+     cprintf("\n");
+   }
+ }
++
++
++int usedvp(void) {
++  struct proc *curproc = myproc();
++  int sz_pages = curproc->sz / PGSIZE; 
++  int stack_guard_page = 1;        
++  return sz_pages + stack_guard_page;
++}
+\ No newline at end of file
+diff --git a/syscall.c b/syscall.c
+index 0ce50b2..858a67d 100644
+--- a/syscall.c
++++ b/syscall.c
+@@ -105,6 +105,8 @@ extern int sys_write(void);
+ extern int sys_uptime(void);
+ extern int sys_hello(void);
+ extern int sys_getppid(void);
++extern int sys_usedvp(void);
++extern int sys_usedpp(void);
+ 
+ static int (*syscalls[])(void) = {
+ [SYS_fork]    sys_fork,
+@@ -130,6 +132,8 @@ static int (*syscalls[])(void) = {
+ [SYS_close]   sys_close,
+ [SYS_hello]   sys_hello,
+ [SYS_getppid] sys_getppid,
++[SYS_usedvp] = sys_usedvp,
++[SYS_usedpp] = sys_usedpp,
+ };
+ 
+ void
+diff --git a/syscall.h b/syscall.h
+index 7c516c5..ee3f8cb 100644
+--- a/syscall.h
++++ b/syscall.h
+@@ -22,3 +22,5 @@
+ #define SYS_close  21
+ #define SYS_hello  22
+ #define SYS_getppid 23
++#define SYS_usedvp  24
++#define SYS_usedpp  25
+diff --git a/sysproc.c b/sysproc.c
+index ff9ab99..8a21c1a 100644
+--- a/sysproc.c
++++ b/sysproc.c
+@@ -19,6 +19,15 @@ int sys_getppid(void)
+   return myproc()->parent->pid;
+ }
+ 
++int sys_usedvp(void) {
++  return usedvp();
++}
++
++int sys_usedpp(void) {
++  return usedpp();
++}
++
++
+ 
+ int
+ sys_fork(void)
+diff --git a/user.h b/user.h
+index c7ccb5c..c4023d3 100644
+--- a/user.h
++++ b/user.h
+@@ -25,6 +25,8 @@ int sleep(int);
+ int uptime(void);
+ int hello(void);
+ int getppid(void);
++int usedvp(void);
++int usedpp(void);
+ 
+ // ulib.c
+ int stat(const char*, struct stat*);
+diff --git a/usys.S b/usys.S
+index acab63b..a8b82fa 100644
+--- a/usys.S
++++ b/usys.S
+@@ -31,3 +31,5 @@ SYSCALL(sleep)
+ SYSCALL(uptime)
+ SYSCALL(hello)
+ SYSCALL(getppid)
++SYSCALL(usedvp)
++SYSCALL(usedpp)
+diff --git a/vm.c b/vm.c
+index 9e54aeb..ca95913 100644
+--- a/vm.c
++++ b/vm.c
+@@ -415,4 +415,20 @@ void vmprint(pde_t *pgdir) {
+         pte_index, pt[pte_index], PTE_ADDR(pt[pte_index]));
+     }
+   }
++}
++
++
++int usedpp(void) {
++  struct proc *curproc = myproc();
++  pde_t *pgdir = curproc->pgdir;
++  int used_pages = 0;
++
++  for (uint va = 0; va < curproc->sz; va += PGSIZE) {
++    pte_t *pte = walkpgdir(pgdir, (void *)va, 0);
++    if (pte && (*pte & PTE_P)) {
++      used_pages++;
++    }
++  }
++
++  return used_pages;
+ }
+\ No newline at end of file

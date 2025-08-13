@@ -1,0 +1,97 @@
+1.
+man hier - opisuje hierarchie systemu plikow
+
+sudo dd if=/dev/sda bs=512 count=1 | hexdump -C
+
+cat /proc/meminfo        # Informacje o pamięci
+cat /proc/cpuinfo        # Informacje o procesorze
+cat /proc/partitions     # Informacje o partycjach
+
+
+
+2.
+ps -eo pid,ppid,stat,pri,nice,%mem,%cpu,tty,cmd
+
+    -e: wyświetla wszystkie procesy w systemie
+    -o: pozwala dostosować wyświetlane kolumny
+    PID: identyfikator procesu
+    PPID: identyfikator procesu rodzica
+    STAT: stan procesu
+    PRI: priorytet procesu
+    NICE: nice procesu
+    %MEM: procent użycia pamięci
+    %CPU: procent użycia CPU
+    TTY: terminal, do którego jest podpięty proces
+    
+ps -p 4748 -o pid,ppid,state,pri,nice,%mem,%cpu,tty,cmd
+    
+ps axjf   #wyswietla wszystkie procesy (nawet te na innych terminalach)
+
+
+
+3.
+$ cat > test.c
+#include <stdio.h>
+
+int main(int argc, char *argv[])
+{
+    printf("Hello, World!\n");
+    return 0;
+}
+^D
+$ gcc -Wall -pedantic test.c
+$ ./a.out
+
+Wall: Włącza wszystkie ostrzeżenia kompilatora.
+-pedantic: Wymusza standard C, zgłaszając ostrzeżenia dla kodu, który jest niezgodny z wybranym standardem.
+
+
+
+4. 
+sleep 100 &
+sleep 101; ^Z
+jobs; bg 1; fg 2
+kill %1; kill %2
+ps; kill 1234; kill -9 1245
+
+
+
+5.
+mkfifo myfifo
+
+echo "hello" > myfifo    # w terminalu 1
+cat < myfifo             # w terminalu 2
+
+
+
+6.
+gcc -Wall -pedantic zad6.c
+./a.out
+cat zad6_2.c
+
+
+
+7.
+mkdir test7
+cd test7
+touch -- " ABC DEF" "-AbC aBc" "--ABC DEF"
+cd ..
+nano zad7.sh      # tworzenie skryptu (...)
+chmod a+x zad7.sh
+./zad7.sh
+
+
+
+8.
+git clone https://github.com/mars-research/hello-os
+cd hello-os
+nano C-version.patch
+# wklejenie zawartosci laty ze strony
+patch -i C-version.patch
+$ sed -i 's/vga std/display curses/g' Makefile
+make qemu
+
+Alt+2 -> przejscie do monitora qemu 
+quit -> wyjscie
+help -> wyswietlenie reszty komend
+Alt+1 -> powrot do emulacji

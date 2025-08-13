@@ -1,0 +1,73 @@
+diff --git a/Makefile b/Makefile
+index 5e5cfb3..cc3a5c9 100644
+--- a/Makefile
++++ b/Makefile
+@@ -186,6 +186,7 @@ UPROGS=\
+ 	_expr\
+ 	_hello\
+ 	_testnewsyscalls\
++	_testvm\
+ 
+ fs.img: mkfs README $(UPROGS)
+ 	./mkfs fs.img README $(UPROGS)
+diff --git a/exec.c b/exec.c
+index b40134f..bbc5e50 100644
+--- a/exec.c
++++ b/exec.c
+@@ -95,6 +93,9 @@ exec(char *path, char **argv)
+     if(*s == '/')
+       last = s+1;
+   safestrcpy(curproc->name, last, sizeof(curproc->name));
++  
++  cprintf("exec");
++  vmprint(pgdir);
+ 
+   // Commit to the user image.
+   oldpgdir = curproc->pgdir;
+diff --git a/proc.c b/proc.c
+index 806b1b1..8f2c633 100644
+--- a/proc.c
++++ b/proc.c
+@@ -261,6 +261,9 @@ exit(void)
+     }
+   }
+ 
++  cprintf("exit");
++  vmprint(myproc()->pgdir);
++
+   // Jump into the scheduler, never to return.
+   curproc->state = ZOMBIE;
+   sched();
+diff --git a/vm.c b/vm.c
+index 7134cff..9e54aeb 100644
+--- a/vm.c
++++ b/vm.c
+@@ -392,3 +392,27 @@ copyout(pde_t *pgdir, uint va, void *p, uint len)
+ //PAGEBREAK!
+ // Blank page.
+ 
++
++
++void vmprint(pde_t *pgdir) {
++  cprintf(" - pgdir %p\n", pgdir);
++
++  for (int pde_index = 0; pde_index < 512; pde_index++) {
++    if (!(pgdir[pde_index] & PTE_P))
++      continue;
++
++    pde_t *pde = &pgdir[pde_index];
++    cprintf(".. %d: pde 0x%x pa 0x%x\n", 
++      pde_index, *pde, PTE_ADDR(*pde));
++
++    pte_t *pt = (pte_t*)P2V(PTE_ADDR(*pde));
++
++    for (int pte_index = 0; pte_index < 1024; pte_index++) {
++      if (!(pt[pte_index] & PTE_P))
++        continue;
++
++      cprintf(".. .. %d: pte 0x%x pa 0x%x\n",
++        pte_index, pt[pte_index], PTE_ADDR(pt[pte_index]));
++    }
++  }
++}
+\ No newline at end of file

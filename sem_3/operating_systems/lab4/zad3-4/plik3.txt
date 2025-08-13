@@ -1,0 +1,5 @@
+lsh
+lsh.c
+plik2.txt
+plik3.txt
+plik.txt

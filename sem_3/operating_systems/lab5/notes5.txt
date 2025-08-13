@@ -1,0 +1,3 @@
+nasm -f elf zad2.asm
+ld -m elf_i386 zad2.o -o zad2
+./zad2

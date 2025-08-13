@@ -1,0 +1,229 @@
+1.
+ps -A -o ppid,pid,state,tty,rss,pgid,sid,comm | grep bash
+./zad1.sh | grep bash
+
+grep: Służy do wyszukiwania wzorców w tekście.
+Opcja -E:
+    Włącza "rozszerzone wyrażenia regularne" (Extended Regular Expressions).
+Wzorzec ^[0-9]+$:
+    ^: Oznacza początek wiersza.
+    [0-9]+: Dopasowuje jedną lub więcej cyfr.
+    $: Oznacza koniec wiersza.
+    
+read -ra stat_array < "$stat_file"
+    read: Wczytuje dane wejściowe i zapisuje je w zmiennych.
+    Opcja -r:
+        Wyłącza specjalne interpretowanie znaków, takich jak backslash (\).
+    Opcja -a:
+        Wczytuje dane do tablicy (stat_array w tym przypadku).
+    < "$stat_file":
+        Przekierowuje zawartość pliku stat_file jako dane wejściowe do read.
+    
+comm="${comm//[()]/}":
+    Zamienia wszystkie wystąpienia znaków ( i ) w zmiennej comm na pusty ciąg (usuwa je).
+    //[()]/: Oznacza, że każdy znak w nawiasach kwadratowych ma zostać znaleziony i zastąpiony.
+    
+awk '/^VmRSS:/ {print $2}' /proc/$pid/status
+    awk: Język przetwarzania tekstu, używany do analizowania i formatowania danych w liniach tekstowych.
+    Wzorzec /^VmRSS:/:
+        Dopasowuje linie zaczynające się od VmRSS:.
+    {print $2}:
+        Wyświetla drugie pole w linii (rozdzielone spacjami lub tabulatorami).
+   
+sed: Narzędzie do przekształcania tekstu.
+s/\/dev\///:
+
+    s: Oznacza operację zamiany (substitution).
+    /\/dev\//: Szuka ciągu /dev/.
+    //: Zamienia go na pusty ciąg (usuwa).
+
+wc: Liczy linie, słowa i znaki w danych wejściowych.
+Opcja -l:
+    Liczy tylko linie (ilość otwartych plików w tym przypadku).
+
+
+PID (Process ID)
+to unikalny identyfikator procesu w systemie operacyjnym. Każdy uruchomiony proces w systemie ma przypisany swój PID, który pozwala na śledzenie procesu i zarządzanie nim (np. zakończenie procesu).
+
+PPID (Parent Process ID)
+to identyfikator procesu rodzica. Określa on proces, który uruchomił dany proces. Dzięki PPID możemy stworzyć hierarchię procesów (procesy potomne i procesy rodzicielskie).
+
+Comm (Command)
+odnosi się do nazwy procesu lub polecenia, które zostało uruchomione. Może to być nazwa programu lub skryptu, który jest wykonywany w systemie.
+
+State
+to stan, w jakim znajduje się proces w danym momencie. Istnieje kilka możliwych stanów, m.in.:
+	R – Running (proces jest w trakcie wykonywania)
+        S – Sleeping (proces czeka na zasoby lub zdarzenie, np. na dane wejściowe)
+        D – Disk sleep (proces czeka na operację wejścia/wyjścia)
+        Z – Zombie (proces zakończył działanie, ale nie został jeszcze zebrany przez proces rodzica)
+        T – Stopped (proces został zatrzymany sygnałem, np. za pomocą SIGSTOP)
+
+TTY (Teletypewriter)
+to terminal lub konsola, do której jest przypisany proces. Wskazuje, z jakim urządzeniem wejścia/wyjścia (terminalem) proces jest związany.
+    Może to być terminal, z którego uruchomiono proces, lub brak takiego związku (np. w przypadku procesów działających w tle lub w ramach daemonów).
+    Jeśli proces nie ma przypisanego terminala, wartość TTY będzie pusta lub wskazywać na specjalne urządzenie, takie jak ? w przypadku procesów systemowych.
+
+RSS (Resident Set Size)
+oznacza rozmiar pamięci, która jest obecnie używana przez proces i znajduje się w pamięci RAM. Mówiąc dokładniej, jest to ilość pamięci fizycznej zajmowanej przez proces.
+    RSS nie uwzględnia pamięci wymienionej do pliku wymiany (swap), tylko tę, która jest fizycznie w RAM-ie.
+
+PGID (Process Group ID)
+to identyfikator grupy procesów, do której należy proces. Grupy procesów służą do zarządzania grupami powiązanych ze sobą procesów (np. w celu wysyłania sygnałów do wszystkich procesów w grupie).
+    Wartość PGID jest zazwyczaj taka sama, jak PID procesu lidera grupy procesów.
+
+SID (Session ID)
+to identyfikator sesji. Sesja jest grupą procesów, które mają wspólne źródło (np. użytkownik logujący się do systemu). Procesy w ramach tej samej sesji mogą współdzielić terminal lub inne zasoby.
+    Lider sesji to proces, który jest odpowiedzialny za zarządzanie sesją. SID jest taki sam dla wszystkich procesów w ramach tej samej sesji, ale różni się między różnymi sesjami.
+
+
+2.
+
+grep -c '^processor' /proc/cpuinfo:
+    grep '^processor': Szuka linii w pliku /proc/cpuinfo, które zaczynają się od processor.
+    -c: Zlicza takie linie.
+    
+awk -v c="cpu$cpu":
+    Ustawia zmienną c o wartości cpu$cpu (np. cpu0 dla pierwszego rdzenia).
+'$1 == c {for(i=2;i<=8;i++) printf $i" "}':
+    Sprawdza, czy pierwsza kolumna ($1) w wierszu jest równa cpu$cpu.
+    Jeśli tak, pętla for iteruje przez kolumny 2 do 8 i wyświetla ich wartości w jednej linii.
+
+cut to narzędzie służące do wyodrębniania określonych części linii tekstu.
+Opcje użyte w tym poleceniu:
+    -d ' ':
+        Ustawia separator (delimiter), który dzieli linię tekstu na pola.
+        Separator to pojedyncza spacja (' '), co oznacza, że każde pole jest oddzielone spacją.
+    -f 1-3:
+        Wyodrębnia pola od 1 do 3.
+
+
+/proc/net/dev
+zawiera informacje o wszystkich interfejsach sieciowych i ich statystykach. Każda linia reprezentuje inny interfejs sieciowy i zawiera informacje o ruchu sieciowym:
+-> Odbierane dane (rx): kolumna 2 to liczba bajtów odebranych przez interfejs.
+-> Wysyłane dane (tx): kolumna 10 to liczba bajtów wysłanych przez interfejs.
+Dzięki temu plikowi można monitorować ilość przesłanych i odebranych danych na poziomie poszczególnych interfejsów sieciowych, np. eth0, wlan0.
+
+/proc/stat
+zawiera statystyki dotyczące działania systemu, w tym informacje o procesorze:
+-> CPU: pierwsza linia zawiera sumaryczne dane dla wszystkich rdzeni procesora, natomiast linie cpu0, cpu1 itd. prezentują dane indywidualnie dla każdego rdzenia.
+    Każda linia procesora ma kilka kolumn liczbowych:
+        user: czas spędzony w trybie użytkownika.
+        nice: czas spędzony w trybie użytkownika z obniżonym priorytetem.
+        system: czas spędzony w trybie jądra.
+        idle: czas, gdy procesor był bezczynny.
+        iowait, irq, softirq: czas oczekiwania na I/O oraz obsługa przerwań.
+Dzięki tym danym można obliczyć procentowe obciążenie procesora na podstawie wzrostu wartości idle w stosunku do całkowitego czasu pracy procesora.
+
+/sys/devices/system/cpu/cpu*/cpufreq/scaling_cur_freq
+zawiera aktualną częstotliwość pracy procesora dla każdego rdzenia (np. cpu0, cpu1 itd.). Wartość jest podana w kilohertzach (kHz). Można ją przeliczyć na megaherce (MHz) dzieląc przez 1000.
+Jest to aktualna częstotliwość taktowania procesora i może się zmieniać w zależności od obciążenia oraz funkcji oszczędzania energii.
+
+/proc/uptime
+zawiera dwa numery:
+-> Pierwszy numer to czas działania systemu w sekundach.
+-> Drugi numer (jeśli występuje) to czas bezczynności systemu we wszystkich rdzeniach procesora.
+Pierwszy z tych numerów pozwala obliczyć, jak długo system jest włączony, co może być przedstawione w dniach, godzinach, minutach i sekundach.
+
+/sys/class/power_supply/BAT0/capacity
+zawiera procentowy poziom naładowania baterii. Jest to wartość od 0 do 100, gdzie 100 oznacza pełne naładowanie baterii, a 0 całkowite rozładowanie.
+
+/proc/loadavg
+zawiera obciążenie systemu, czyli load average:
+-> Pierwsze trzy liczby reprezentują średnie obciążenie systemu w ciągu ostatnich 1, 5 oraz 15 minut.
+-> Czwarta liczba pokazuje liczbę aktywnych procesów i całkowitą liczbę procesów.
+-> Piąta liczba to ostatnie użyte PID.
+Obciążenie systemu (load average) to miara wskazująca, ile procesów jest obecnie w stanie uruchomionym lub oczekującym na zasoby CPU, co pozwala na ocenę bieżącej wydajności systemu.
+              The first three fields in this file are load average
+              figures giving the number of jobs in the run queue (state
+              R) or waiting for disk I/O (state D) averaged over 1, 5,
+              and 15 minutes.  They are the same as the load average
+              numbers given by uptime(1) and other programs.  The fourth
+              field consists of two numbers separated by a slash (/).
+              The first of these is the number of currently runnable
+              kernel scheduling entities (processes, threads).  The
+              value after the slash is the number of kernel scheduling
+              entities that currently exist on the system.  The fifth
+              field is the PID of the process that was most recently
+              created on the system.
+
+/proc/meminfo
+zawiera szczegółowe informacje o pamięci systemowej. W szczególności pierwsze trzy linie zawierają:
+    MemTotal: całkowita ilość pamięci RAM dostępna w systemie.
+    MemFree: ilość pamięci fizycznej, która jest wolna (niezajęta).
+    Buffers: pamięć używana jako bufor.
+    Cached: pamięć cache
+Dzięki tym informacjom można obliczyć, ile pamięci RAM jest aktualnie używane (czyli MemTotal - MemFree - Buffers - Cached).
+
+
+3.
+
+jq:
+    Narzędzie do parsowania i manipulacji plikami JSON.
+    -r: Wyświetla wynik jako tekst surowy (raw), usuwając cudzysłowy z wyniku.
+    '.[0].url':
+        .[0]: Odczytuje pierwszy element tablicy JSON (tablica zawiera obiekt z informacjami o kocie).
+        .url: Pobiera wartość pola url (link do obrazu).
+
+REST API to sposób wymiany danych pomiędzy różnymi aplikacjami przez Internet. Umożliwia komunikację za pomocą standardowych metod HTTP (GET, POST, PUT, DELETE) w celu uzyskania dostępu do danych lub operacji udostępnianych przez serwer. REST API operuje najczęściej na formatach JSON lub XML, które są łatwe do odczytania zarówno przez ludzi, jak i maszyny.
+
+CURL to narzędzie wiersza poleceń do wykonywania zapytań HTTP i pobierania danych z Internetu. Obsługuje różne protokoły (HTTP, HTTPS, FTP i inne) i jest często używany do pracy z API.
+
+JQ to narzędzie wiersza poleceń, które służy do analizowania i przetwarzania danych w formacie JSON. Jest przydatne do wyodrębniania konkretnych wartości z JSON-a, co ułatwia pracę z danymi uzyskanymi z API.
+
+CATIMG to narzędzie umożliwiające wyświetlanie obrazów w terminalu, które wyświetla obraz w formie kolorowej.
+
+.[0].url – wskazuje na pierwszy element tablicy JSON i wybiera pole url.
+-r – opcja jq, która usuwa cudzysłowy z wyniku, aby można go było użyć jako czysty tekst.
+-s – tryb cichy.
+-o – zapisuje wynik do pliku o określonej nazwie (/tmp/cat_image.jpg).
+
+
+4.
+# zmiana w Makefile:
+UPROGS=\
+    _cat\
+    _echo\
+    _expr\       # Dodanie expr
+    _forktest\
+    _grep\
+    _init\
+    _kill\
+    _ln\
+    _ls\
+    _mkdir\
+    _rm\
+    ...
+
+
+
+6.
+set -euo pipefail
+    set: Włącza tryby wykonywania skryptu:
+        -e: Skrypt przerywa działanie po napotkaniu błędu w dowolnej linii.
+        -u: Przerywa skrypt, jeśli użyta zostanie niezainicjalizowana zmienna.
+        pipefail: W przypadku użycia potoków (|), jeśli jakikolwiek etap potoku zakończy się błędem, cały skrypt zostaje przerwany.
+
+trap 'echo "Error at line $LINENO: $BASH_COMMAND"' ERR
+    trap: Definiuje akcję w przypadku wystąpienia błędu.
+        ERR: Pułapka aktywuje się, gdy wystąpi błąd.
+        $LINENO: Numer linii, w której wystąpił błąd.
+        $BASH_COMMAND: Ostatnie polecenie, które spowodowało błąd.
+
+clear_screen() {
+    echo -ne "${ESC}[2J${ESC}[H"
+}
+    ${ESC}[2J: Kod ANSI, który usuwa całą zawartość terminala.
+    ${ESC}[H: Przenosi kursor do pozycji (1,1) (lewy górny róg terminala).
+    echo -ne:
+        -n: Nie dodaje nowej linii na końcu tekstu.
+        -e: Włącza interpretację sekwencji ucieczki (\033).
+        
+shuf -e "${directions[@]}"
+    shuf: przetasowuje wartości.
+    -e: traktuje każdy argument jako input.
+        
+read -rsn1: Pobiera jeden znak wejściowy.
+    -r: Bez przetwarzania znaków specjalnych.
+    -s: Tryb cichy.
+    -n1: Tylko jeden znak.

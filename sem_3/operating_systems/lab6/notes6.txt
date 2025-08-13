@@ -1,0 +1,242 @@
+Zadanie 1.
+
+**Zmiana w pliku `Makefile`**
+
++    _testvm\
+
+- Linia dodana w `UPROGS`: Dodaje plik wykonywalny `_testvm` do listy programów użytkownika, które mają być zbudowane i włączone do obrazu systemu plików `fs.img`. 
+
+
+
+**Zmiana w pliku `exec.c`**
+
++    cprintf("exec");
++    vmprint(myproc()->pgdir);
+
+1. `cprintf("exec");`:  
+   - Wywołuje funkcję `cprintf` (print kernelowy) i wypisuje słowo `exec` na konsolę jądra. Informuje to, że funkcja `exec` została wywołana.
+2. `vmprint(myproc()->pgdir);`:  
+   - Wywołuje funkcję `vmprint` na katalogu stron (`pgdir`) aktualnego procesu (`myproc()`).
+   - `myproc()`: Funkcja zwraca wskaźnik na aktualny proces.
+   - `pgdir`: Pole w strukturze procesu wskazujące na katalog stron.
+   - Celem jest wydrukowanie tabeli stronicowania po załadowaniu obrazu nowego programu.
+
+
+
+**Zmiana w pliku `proc.c`**
+
++  cprintf("exit");
++  vmprint(myproc()->pgdir);
+
+1. `cprintf("exit");`:  
+   - Wywołuje funkcję `cprintf` i wypisuje słowo `exit` na konsolę jądra. Informuje to, że funkcja `exit` została wywołana.
+2. `vmprint(myproc()->pgdir);`:  
+   - Wywołuje funkcję `vmprint` na katalogu stron (`pgdir`) aktualnego procesu (`myproc()`).
+   - Drukuje tabelę stron procesu **tuż przed jego zakończeniem**.
+
+
+
+**Zmiana w pliku `vm.c`**
+
+#### Definicja funkcji `vmprint`, która drukuje katalog stron (`pgdir`) i tabelę stron (`pte`):
+
+void vmprint(pde_t *pgdir) {
+
+- Definicja funkcji `vmprint`.  
+  - **`pde_t *pgdir`**: Wskaźnik na katalog stron (Page Directory), który jest tablicą 512 wpisów (PDE - Page Directory Entry).
+
+
+#### Drukowanie adresu katalogu stron:
+
+cprintf(" - pgdir %p\n", pgdir);
+
+- Wywołuje `cprintf`, aby wydrukować adres katalogu stron (`pgdir`).
+- **`%p`**: Format dla wskaźników (adresów).
+
+
+#### Iteracja po wpisach katalogu stron (PDE):
+
+for (int pde_index = 0; pde_index < 512; pde_index++) {
+
+- Pętla iterująca po 512 wpisach w katalogu stron (maksymalna liczba wpisów w katalogu na poziomie użytkownika w XV6).
+
+
+#### Pomijanie niezamapowanych wpisów:
+
+if (!(pgdir[pde_index] & PTE_P))
+  continue;
+
+- Sprawdza, czy bieżący wpis katalogu stron (`pgdir[pde_index]`) ma ustawiony bit **PTE_P** (Presence).  
+  - Jeśli nie, wpis nie jest zamapowany i pętla przechodzi do następnej iteracji (`continue`).
+
+
+#### Drukowanie zamapowanego wpisu PDE:
+
+pde_t *pde = &pgdir[pde_index];
+cprintf(".. %d: pde 0x%x pa 0x%x\n", 
+  pde_index, *pde, PTE_ADDR(*pde));
+
+- `pde_t *pde = &pgdir[pde_index];`: Pobiera adres bieżącego wpisu PDE.
+- `cprintf`: Wypisuje:
+  - Indeks PDE (`pde_index`).
+  - Wartość wpisu PDE (`*pde`).
+  - adres fizyczny PDE (`PTE_ADDR(*pde)`), wyciągnięty przez maskę `PTE_ADDR`.
+
+
+#### Iteracja po tabeli stron (PTE):
+
+pte_t *pt = (pte_t*)P2V(PTE_ADDR(*pde));
+for (int pte_index = 0; pte_index < 1024; pte_index++) {
+
+1. `pte_t *pt = (pte_t*)P2V(PTE_ADDR(*pde));`:  
+   - Pobiera adres tabeli stron (Page Table) związanej z bieżącym wpisem PDE.
+   - `PTE_ADDR(*pde)`: Adres fizyczny tabeli stron.
+   - `P2V`: Makro konwertujące adres fizyczny na wirtualny.
+2. `for (int pte_index = 0; pte_index < 1024; pte_index++)`:  
+   - Pętla iterująca po 1024 wpisach w tabeli stron (maksymalna liczba PTE w jednej tabeli stron).
+
+
+#### Pomijanie niezamapowanych wpisów PTE:
+
+if (!(pt[pte_index] & PTE_P))
+  continue;
+
+- Sprawdza, czy bieżący wpis PTE (`pt[pte_index]`) ma ustawiony bit PTE_P (Presence).  
+  - Jeśli nie, wpis nie jest zamapowany i pętla przechodzi do następnej iteracji (`continue`).
+
+
+#### Drukowanie zamapowanego wpisu PTE:
+
+cprintf(".. .. %d: pte 0x%x pa 0x%x\n",
+  pte_index, pt[pte_index], PTE_ADDR(pt[pte_index]));
+
+- `cprintf`: Wypisuje:
+  - Indeks PTE (`pte_index`).
+  - Wartość wpisu PTE (`pt[pte_index]`).
+  - Adres fizyczny PTE (`PTE_ADDR(pt[pte_index])`), wyciągnięty przez maskę `PTE_ADDR`.
+
+
+
+
+
+**Podsumowanie**
+
+Funkcja `vmprint`:
+
+1. Iteruje po katalogu stron (`pgdir`).
+2. Drukuje zamapowane wpisy PDE (zawierające adresy tabel stron).
+3. Iteruje po każdej tabeli stron (PTE) związanej z zamapowanym PDE.
+4. Drukuje zamapowane wpisy PTE (zawierające adresy fizyczne stron pamięci).
+
+Zmiany w plikach `exec.c` i `proc.c` dodają wywołania `vmprint` w odpowiednich momentach:
+- W `exec`, po załadowaniu nowego obrazu programu.
+- W `exit`, przed zakończeniem procesu.
+
+
+
+
+
+
+
+Zadanie 2.
+
+
+
+1. **`Makefile`**
+
++	_usedmemtest\
+
+Dodano `_usedmemtest` do listy programów użytkownika (`UPROGS`), które są kompilowane i dołączane do systemu plików (`fs.img`). Dzięki temu testowy program `usedmemtest.c` zostanie automatycznie skompilowany i uwzględniony.
+
+
+2. **`proc.c`**
+
+int usedvp(void) {
+  struct proc *curproc = myproc();
+  int sz_pages = curproc->sz / PGSIZE; 
+  int stack_guard_page = 1;        
+  return sz_pages + stack_guard_page;
+}
+
+- `myproc()`: Funkcja ta zwraca wskaźnik na bieżący proces. Pozwala na dostęp do jego struktury `struct proc`.
+- `curproc->sz`: Pobierana jest wielkość pamięci użytkownika procesu (w bajtach).
+- `curproc->sz / PGSIZE`: Przeliczamy wielkość pamięci na liczbę stron wirtualnych (każda strona ma rozmiar `PGSIZE`, np. 4096 bajtów).
+- `int stack_guard_page = 1;`: Dodajemy stronę ochronną stosu (przestrzeń rezerwowa).
+- `return sz_pages + stack_guard_page;`: Funkcja zwraca całkowitą liczbę stron wirtualnych, uwzględniając stronę ochronną.
+
+
+3. **`syscall.c`**
+
++extern int sys_usedvp(void);
++extern int sys_usedpp(void);
+
+Dodano deklaracje nowych funkcji systemowych `sys_usedvp` i `sys_usedpp`. Funkcje te są implementacjami obsługi nowych wywołań systemowych.
+
++[SYS_usedvp] = sys_usedvp,
++[SYS_usedpp] = sys_usedpp,
+
+- `[SYS_usedvp]` i `[SYS_usedpp]`: Numery wywołań systemowych (zdefiniowane w `syscall.h`).
+- `sys_usedvp` i `sys_usedpp`: Funkcje obsługujące wywołania systemowe, powiązane z numerami.
+
+
+4. **`syscall.h`**
+
++#define SYS_usedvp  24
++#define SYS_usedpp  25
+
+Każde wywołanie systemowe musi mieć unikalny numer. `SYS_usedvp` to 24, a `SYS_usedpp` to 25. Numery te są używane w `syscall.c` i `usys.S`.
+
+
+5. **`sysproc.c`**
+
+int sys_usedvp(void) {
+  return usedvp();
+}
+
+int sys_usedpp(void) {
+  return usedpp();
+}
+
+- `sys_usedvp` i `sys_usedpp`: Te funkcje są wywoływane, gdy proces użytkownika wykonuje odpowiednie wywołania systemowe.
+- `usedvp()` i `usedpp()`: Wywoływane są funkcje zdefiniowane w jądrowej części kodu (`proc.c` lub `vm.c`), które zwracają liczby stron wirtualnych i fizycznych.
+
+
+6. **`user.h`**
+
++int usedvp(void);
++int usedpp(void);
+
+Funkcje `usedvp()` i `usedpp()` są teraz dostępne w programach użytkownika. Dzięki temu możesz ich używać np. w testach.
+
+
+7. **`usys.S`**
+
++SYSCALL(usedvp)
++SYSCALL(usedpp)
+
+Makra `SYSCALL` generują kod potrzebny do wykonania wywołań systemowych. `usedvp` i `usedpp` są teraz dostępne dla procesów użytkownika.
+
+
+8. **`vm.c`**
+
+int usedpp(void) {
+  struct proc *curproc = myproc();
+  pde_t *pgdir = curproc->pgdir;
+  int used_pages = 0;
+
+  for (uint va = 0; va < curproc->sz; va += PGSIZE) {
+    pte_t *pte = walkpgdir(pgdir, (void *)va, 0);
+    if (pte && (*pte & PTE_P)) {
+      used_pages++;
+    }
+  }
+
+  return used_pages;
+}
+
+- `myproc()`: Pobiera bieżący proces.
+- `curproc->pgdir`: Pobiera tablicę stron procesu.
+- `for` (iteracja): Przechodzimy przez każdą wirtualną stronę w obszarze pamięci procesu.
+- `walkpgdir(pgdir, (void *)va, 0)`: Sprawdza tablicę stron, czy strona wirtualna jest zmapowana.
+- `if (pte && (*pte & PTE_P))`: Liczy stronę fizyczną, jeśli wpis w tablicy stron jest obecny (`PTE_P`).
+- `used_pages++`: Zwiększa licznik używanych stron fizycznych.

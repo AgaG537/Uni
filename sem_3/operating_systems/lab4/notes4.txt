@@ -1,0 +1,826 @@
+1.
+gcc mysudo.c -o mysudo
+
+ls -l
+-rwxrwxr-x 1 aga aga 16000 Nov 28 20:54 mysudo
+-rw-rw-r-- 1 aga aga   142 Nov 28 20:54 mysudo.c
+
+sudo chown root:root mysudo
+
+ls -l
+-rwxrwxr-x 1 root root 16000 Nov 28 20:54 mysudo
+-rw-rw-r-- 1 aga  aga    142 Nov 28 20:54 mysudo.c
+
+sudo chmod u+s mysudo
+
+ls -l
+-rwsrwxr-x 1 root root 16000 Nov 28 20:54 mysudo
+-rw-rw-r-- 1 aga  aga    142 Nov 28 20:54 mysudo.c
+
+./mysudo
+
+
+setuid(0):
+    Funkcja setuid ustawia identyfikator użytkownika procesu (UID).
+    UID 0 oznacza użytkownika root, który ma pełne uprawnienia administracyjne w systemie Linux.
+    Dzięki temu proces przyjmuje uprawnienia roota.
+    
+execl("/bin/bash", "bash", NULL):
+    Funkcja execl uruchamia wskazany program (w tym przypadku /bin/bash).
+    Pierwszy argument /bin/bash to ścieżka do programu, który ma zostać uruchomiony.
+    Drugi argument ("bash") jest nazwą programu przekazywaną jako argument do procesu.
+    Ostatni argument NULL oznacza koniec listy argumentów.
+    Gdy execl zostanie wykonana, bieżący proces zostanie zastąpiony nowym programem (bash).
+    
+-rwxrwxr-x 1 aga aga 16000 Nov 28 20:54 mysudo
+    -rwxrwxr-x: Uprawnienia pliku:
+        rwx: Właściciel (aga) może czytać, zapisywać i uruchamiać plik.
+        rwx: Grupa (aga) ma te same uprawnienia.
+        r-x: Inni użytkownicy mogą czytać i uruchamiać plik.
+    1: Liczba linków do pliku.
+    aga aga: Właściciel i grupa pliku.
+    16000: Rozmiar pliku w bajtach.
+    Nov 28 20:54: Data ostatniej modyfikacji pliku.
+    mysudo: Nazwa pliku.
+
+sudo chown root:root mysudo
+    sudo: Uruchamia polecenie z uprawnieniami administratora.
+    chown root:root mysudo: chown zmienia właściciela (root) i grupę (root) pliku mysudo.
+
+Po tej operacji:
+-rwxrwxr-x 1 root root 16000 Nov 28 20:54 mysudo
+    Plik jest teraz własnością użytkownika i grupy root.
+    
+sudo chmod u+s mysudo
+    chmod: Służy do zmiany uprawnień pliku.
+    u+s: Dodaje bit setuid, który pozwala na uruchamianie programu z uprawnieniami właściciela pliku (w tym przypadku root), niezależnie od użytkownika, który uruchamia program.
+
+Po tej operacji:
+-rwsrwxr-x 1 root root 16000 Nov 28 20:54 mysudo
+    Litera s w miejscu uprawnień właściciela (rws) oznacza aktywny bit setuid.
+    
+./mysudo uruchamia program mysudo.
+Dzięki bitowi setuid program działa z UID 0 (root), niezależnie od tego, kto go uruchomi.
+
+
+CAŁY PROCES:
+a) Ustawienie setuid:
+    Normalnie programy działają z uprawnieniami użytkownika, który je uruchamia.
+    Bit setuid sprawia, że program działa z uprawnieniami właściciela pliku (w tym przypadku root).
+b) Zmiana użytkownika na root (setuid(0)):
+    Dzięki bitowi setuid i funkcji setuid(0) program zmienia użytkownika procesu na root.
+c) Uruchomienie powłoki (execl("/bin/bash")):
+    Proces programu zostaje zastąpiony przez powłokę Bash.
+    Bash działa z uprawnieniami root, co oznacza, że można wykonywać polecenia administracyjne bez hasła.
+    
+    
+2.
+
+int result = kill(pid_t pid, int sig);
+    int sig: The signal that should be sent to the processes specified by pid. This must be 0 or one of the signals defined in the signal.h header file. If sig is 0, kill() performs error checking but does not send a signal. You can code sig as 0 to check whether the pid argument is valid. 
+    
+Returned value
+kill() returns 0 if it has permission to send sig to any of the processes specified by pid. If kill() fails to send a signal, it returns -1 and sets errno to one of the following values:
+-> EINVAL: The value of sig is incorrect or is not the number of a supported signal.
+-> EPERM: The caller does not have permission to send the signal to any process specified by pid.
+-> ESRCH: There are no processes or process groups corresponding to pid.
+
+
+
+
+6.
+# syscall.h  -> reserving system call number
+#define SYS_hello  22
+#define SYS_getppid 23
+
+
+# syscall.c   -> adding pointer to syscall and function prototype
+# when syscall nr 22 occured, function pointed by sys_hello will be called.
+# when syscall nr 23 occured, function pointed by sys_getppid will be called.
+extern int sys_hello(void);
+extern int sys_getppid(void);
+
+[SYS_hello]   sys_hello,
+[SYS_getppid] sys_getppid,
+
+
+# sysproc.c   -> implementing syscall functions
+int
+sys_hello(void)
+{
+  cprintf("Hello World!\n"); 
+  return 0; 
+}
+
+int sys_getppid(void)
+{
+  return myproc()->parent->pid;
+}
+
+
+# usys.S   -> adding interface for the user to be able to call syscall
+SYSCALL(hello)
+SYSCALL(getppid)
+
+
+# user.h   -> adding function prototypes which user program will call
+int hello(void);
+int getppid(void);
+
+
+# testnewsyscalls.c
+
+#include "types.h"
+#include "stat.h"
+#include "user.h"
+
+int
+main(int argc, char *argv[])
+{
+  printf(1, "wynik syscalla hello:\n");
+  hello();
+  printf(1, "wynik syscalla getppid: %d\n", getppid());
+  exit();
+}
+
+
+# Makefile
+        _testnewsyscalls\
+
+
+
+
+3-4.
+
+Nagłówki i stałe
+c
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <fcntl.h>
+#include <signal.h>
+#include <errno.h>
+
+#include: Instrukcje preprocesora, które dołączają niezbędne biblioteki:
+
+    <stdio.h>: Funkcje standardowego wejścia/wyjścia (printf, fprintf itp.).
+
+    <stdlib.h>: Funkcje ogólne (malloc, free, exit itp.).
+
+    <string.h>: Funkcje manipulacji stringami (strtok, strcmp itp.).
+
+    <unistd.h>: Funkcje POSIX (fork, exec, pipe, dup2 itp.).
+
+    <sys/wait.h>: Funkcje obsługi procesów potomnych (waitpid itp.).
+
+    <fcntl.h>: Operacje na plikach (open itp.).
+
+    <signal.h>: Obsługa sygnałów (signal, kill itp.).
+
+    <errno.h>: Definicje kodów błędów (errno itp.).
+
+c
+
+#define MAX_LINE 1024
+#define MAX_ARGS 128
+
+#define: Definicje preprocesora:
+
+    MAX_LINE: Maksymalna długość linii wejściowej (1024 znaki).
+
+    MAX_ARGS: Maksymalna liczba argumentów w jednej komendzie (128 argumentów).
+
+Deklaracje funkcji
+c
+
+void lsh_loop();
+char **lsh_parse_line(char *line, int *is_background);
+int lsh_execute(char **args, int is_background);
+int lsh_execute_command(char **args, int in_fd, int out_fd, int err_fd, int is_background);
+int lsh_handle_builtins(char **args);
+void sigchld_handler();
+void sigint_handler();
+
+Deklaracje funkcji używanych w programie:
+
+    lsh_loop: Główna pętla powłoki.
+
+    lsh_parse_line: Funkcja parsująca linię wejściową na argumenty.
+
+    lsh_execute: Wykonuje komendę z obsługą potoków i przekierowań.
+
+    lsh_execute_command: Wykonuje pojedynczą komendę.
+
+    lsh_handle_builtins: Obsługa wbudowanych komend (np. cd, exit).
+
+    sigchld_handler: Obsługa sygnału SIGCHLD.
+
+    sigint_handler: Obsługa sygnału SIGINT.
+
+Zmienna globalna
+c
+
+volatile sig_atomic_t foreground_process = 0;
+
+volatile sig_atomic_t foreground_process: Zmienna globalna do przechowywania PID (Process ID) aktywnego procesu w pierwszym planie.
+
+    volatile: Informuje kompilator, że wartość zmiennej może się zmieniać w sposób nieprzewidywalny, na przykład w wyniku sygnałów.
+
+    sig_atomic_t: Typ zmiennoprzecinkowy, którego wartość może być bezpiecznie modyfikowana w procedurach obsługi sygnałów.
+
+Funkcje obsługi sygnałów
+c
+
+void sigchld_handler() {
+    while (waitpid(-1, NULL, WNOHANG) > 0);
+}
+
+sigchld_handler: Funkcja obsługująca sygnał SIGCHLD, usuwająca procesy zombie.
+
+    while (waitpid(-1, NULL, WNOHANG) > 0): Pętla czekająca na zakończenie wszystkich procesów potomnych bez blokowania.
+
+    waitpid(-1, NULL, WNOHANG): -1 oznacza, że czekamy na dowolny proces potomny; NULL oznacza, że nie interesuje nas status zakończenia; WNOHANG mówi, żeby nie blokować, jeśli żaden proces potomny nie zakończył się.
+
+c
+
+void sigint_handler() {
+    if (foreground_process != 0) {
+        kill(foreground_process, SIGINT);
+    }
+}
+
+sigint_handler: Funkcja obsługująca sygnał SIGINT, przerywająca tylko aktywny proces.
+
+    if (foreground_process != 0): Sprawdza, czy istnieje aktywny proces w pierwszym planie.
+
+    kill(foreground_process, SIGINT): Wysyła sygnał SIGINT do aktywnego procesu w pierwszym planie.
+
+Funkcja parsująca linię na argumenty
+c
+
+char **lsh_parse_line(char *line, int *is_background) {
+    int bufsize = MAX_ARGS, position = 0;
+    char **tokens = malloc(bufsize * sizeof(char *));
+    char *token;
+
+    if (!tokens) {
+        fprintf(stderr, "lsh: allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+
+    token = strtok(line, " \t\r\n");
+    while (token != NULL) {
+        if (strcmp(token, "&") == 0) {
+            *is_background = 1; // Proces w tle
+            break;
+        }
+
+        tokens[position++] = token;
+
+        if (position >= bufsize) {
+            bufsize += MAX_ARGS;
+            tokens = realloc(tokens, bufsize * sizeof(char *));
+            if (!tokens) {
+                fprintf(stderr, "lsh: allocation error\n");
+                exit(EXIT_FAILURE);
+            }
+        }
+
+        token = strtok(NULL, " \t\r\n");
+    }
+    tokens[position] = NULL;
+    return tokens;
+}
+
+lsh_parse_line: Funkcja parsująca linię wejściową na argumenty.
+
+    *char line: Linia wejściowa.
+
+    *int is_background: Zmienna wskazująca, czy proces ma być uruchomiony w tle.
+
+    Inicjalizacja zmiennych:
+
+        int bufsize = MAX_ARGS, position = 0: Inicjalizacja rozmiaru bufora i pozycji w tablicy tokenów.
+
+        **char *tokens = malloc(bufsize * sizeof(char )): Alokacja pamięci na tablicę tokenów.
+
+        *char token: Zmienna przechowująca pojedynczy token.
+
+    Sprawdzenie alokacji pamięci:
+
+        if (!tokens): Sprawdza, czy alokacja pamięci się powiodła.
+
+        fprintf(stderr, "lsh: allocation error\n"); exit(EXIT_FAILURE): Wyświetla błąd i kończy program, jeśli alokacja się nie powiodła.
+
+    Tokenizacja linii:
+
+        token = strtok(line, " \t\r\n"): Dzieli linię na tokeny za pomocą znaków rozdzielających (spacja, tabulator, powrót karetki, nowa linia).
+
+        while (token != NULL): Pętla przechodząca przez wszystkie tokeny.
+
+    Sprawdzenie procesu w tle:
+
+        if (strcmp(token, "&") == 0): Sprawdza, czy token to "&".
+
+        is_background = 1: Ustawia zmienną is_background na 1, oznaczając proces w tle.
+
+        break: Przerywa pętlę.
+
+    Dodawanie tokenów do tablicy:
+
+        tokens[position++] = token: Dodaje token do tablicy tokens.
+
+        if (position >= bufsize): Sprawdza, czy tablica tokenów jest pełna.
+
+        bufsize += MAX_ARGS: Zwiększa rozmiar bufora.
+
+        *tokens = realloc(tokens, bufsize * sizeof(char )): Reallokuje pamięć dla tablicy tokenów.
+
+        if (!tokens): Sprawdza, czy reallokacja pamięci się powiodła.
+
+        fprintf(stderr, "lsh: allocation error\n"); exit(EXIT_FAILURE): Wyświetla błąd i kończy program, jeśli reallokacja się nie powiodła.
+
+    Pobieranie kolejnego tokena:
+
+        token = strtok(NULL, " \t\r\n"): Pobiera kolejny token.
+
+    Zakończenie tablicy tokenów:
+
+        tokens[position] = NULL: Ustawia ostatni element tablicy tokenów na NULL
+
+
+Obsługa wbudowanych komend (kontynuacja)
+c
+
+int lsh_handle_builtins(char **args) {
+    if (args[0] == NULL) {
+        return 1;
+    }
+    if (strcmp(args[0], "exit") == 0) {
+        exit(0);
+    } else if (strcmp(args[0], "cd") == 0) {
+        if (args[1] == NULL) {
+            fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+        } else if (chdir(args[1]) != 0) {
+            perror("lsh");
+        }
+        return 1;
+    }
+    return 0;
+}
+
+lsh_handle_builtins: Funkcja obsługująca wbudowane komendy.
+
+    **char args: Tablica argumentów.
+
+    Sprawdzenie pustych argumentów:
+
+        if (args[0] == NULL): Sprawdza, czy pierwszy argument jest pusty.
+
+        return 1: Zwraca 1, co oznacza, że komenda została przetworzona (brak komendy do wykonania).
+
+    Obsługa komendy "exit":
+
+        if (strcmp(args[0], "exit") == 0): Sprawdza, czy pierwszy argument to "exit".
+
+        exit(0): Kończy program z kodem wyjścia 0.
+
+    Obsługa komendy "cd":
+
+        else if (strcmp(args[0], "cd") == 0): Sprawdza, czy pierwszy argument to "cd".
+
+        if (args[1] == NULL): Sprawdza, czy drugi argument (ścieżka) jest pusty.
+
+        fprintf(stderr, "lsh: expected argument to \"cd\"\n"): Wyświetla komunikat o błędzie, jeśli brakuje argumentu.
+
+        else if (chdir(args[1]) != 0): Zmienia bieżący katalog na ten podany jako drugi argument.
+
+        perror("lsh"): Wyświetla komunikat o błędzie, jeśli nie uda się zmienić katalogu.
+
+        return 1: Zwraca 1, co oznacza, że komenda została przetworzona.
+
+    Zwrócenie 0: Komenda nie była wbudowana, przekazuje ją dalej do wykonania:
+
+        return 0: Zwraca 0, co oznacza, że komenda nie była wbudowana.
+
+Wykonanie pojedynczej komendy
+c
+
+int lsh_execute_command(char **args, int in_fd, int out_fd, int err_fd, int is_background) {
+    pid_t pid;
+    int status;
+
+    pid = fork();
+    if (pid == 0) {
+        // Proces potomny
+        if (in_fd != STDIN_FILENO) {
+            dup2(in_fd, STDIN_FILENO);
+            close(in_fd);
+        }
+        if (out_fd != STDOUT_FILENO) {
+            dup2(out_fd, STDOUT_FILENO);
+            close(out_fd);
+        }
+        if (err_fd != STDERR_FILENO) {
+            dup2(err_fd, STDERR_FILENO);
+            close(err_fd);
+        }
+        if (execvp(args[0], args) == -1) {
+            perror("lsh");
+        }
+        exit(EXIT_FAILURE);
+    } else if (pid < 0) {
+        // Błąd forkowania
+        perror("lsh");
+    } else {
+        if (is_background) {
+            // Proces w tle - nie czekaj na zakończenie
+            printf("[Proces w tle uruchomiony] PID: %d\n", pid);
+        } else {
+            // Proces pierwszoplanowy
+            foreground_process = pid;
+            waitpid(pid, &status, 0);
+            foreground_process = 0;
+        }
+    }
+
+    return 1;
+}
+
+lsh_execute_command: Funkcja wykonująca pojedynczą komendę, uwzględniając przekierowania i procesy w tle.
+
+    **char args: Tablica argumentów.
+
+    int in_fd: Deskryptor pliku wejściowego.
+
+    int out_fd: Deskryptor pliku wyjściowego.
+
+    int err_fd: Deskryptor pliku wyjścia błędów.
+
+    int is_background: Flaga wskazująca, czy proces ma być uruchomiony w tle.
+
+    Deklaracja zmiennych:
+
+        pid_t pid: Identyfikator procesu.
+
+        int status: Status zakończenia procesu.
+
+    Forkowanie procesu:
+
+        pid = fork(): Tworzy nowy proces potomny.
+
+    Proces potomny:
+
+        if (pid == 0): Kod wykonywany przez proces potomny.
+
+            if (in_fd != STDIN_FILENO): Sprawdza, czy wejście jest przekierowane.
+
+                dup2(in_fd, STDIN_FILENO): Duplikuje deskryptor pliku na standardowe wejście.
+
+                close(in_fd): Zamknięcie oryginalnego deskryptora pliku.
+
+            if (out_fd != STDOUT_FILENO): Sprawdza, czy wyjście jest przekierowane.
+
+                dup2(out_fd, STDOUT_FILENO): Duplikuje deskryptor pliku na standardowe wyjście.
+
+                close(out_fd): Zamknięcie oryginalnego deskryptora pliku.
+
+            if (err_fd != STDERR_FILENO): Sprawdza, czy wyjście błędów jest przekierowane.
+
+                dup2(err_fd, STDERR_FILENO): Duplikuje deskryptor pliku na standardowe wyjście błędów.
+
+                close(err_fd): Zamknięcie oryginalnego deskryptora pliku.
+
+            execvp(args[0], args): Uruchamia nowy program wskazany przez args[0] z argumentami args.
+
+                if (execvp(args[0], args) == -1): Sprawdza, czy uruchomienie programu się powiodło.
+
+                    perror("lsh"): Wyświetla komunikat o błędzie, jeśli uruchomienie programu się nie powiodło.
+
+                    exit(EXIT_FAILURE): Kończy proces potomny z kodem wyjścia EXIT_FAILURE.
+
+    Błąd forkowania:
+
+        else if (pid < 0): Sprawdza, czy forkowanie się nie powiodło.
+
+            perror("lsh"): Wyświetla komunikat o błędzie.
+
+    Proces rodzicielski:
+
+        else: Kod wykonywany przez proces rodzicielski.
+
+            if (is_background): Sprawdza, czy proces ma być uruchomiony w tle.
+
+                printf("[Proces w tle uruchomiony] PID: %d\n", pid): Wyświetla komunikat o uruchomieniu procesu w tle.
+
+            else: Proces pierwszoplanowy.
+
+                foreground_process = pid: Ustawia zmienną globalną na PID procesu pierwszoplanowego.
+
+                waitpid(pid, &status, 0): Czeka na zakończenie procesu potomnego.
+
+                foreground_process = 0: Resetuje zmienną globalną.
+
+    Zwrócenie 1: Funkcja zawsze zwraca 1 (komenda została przetworzona).
+
+
+Wykonanie komendy z obsługą potoków i przekierowań (kontynuacja)
+c
+
+int lsh_execute(char **args, int is_background) {
+    int in_fd = STDIN_FILENO;
+    int out_fd = STDOUT_FILENO;
+    int err_fd = STDERR_FILENO;
+
+    char *cmd[MAX_ARGS];
+    int cmd_index = 0;
+
+    for (int i = 0; args[i] != NULL; i++) {
+        if (strcmp(args[i], "|") == 0) {
+            // Potoki
+            int pipe_fd[2];
+            pipe(pipe_fd);
+
+            cmd[cmd_index] = NULL;
+            lsh_execute_command(cmd, in_fd, pipe_fd[1], err_fd, 0);
+
+            close(pipe_fd[1]);
+            in_fd = pipe_fd[0];
+            cmd_index = 0;
+        } else if (strcmp(args[i], "<") == 0) {
+            // Przekierowanie wejścia
+            in_fd = open(args[++i], O_RDONLY);
+            if (in_fd < 0) {
+                perror("lsh");
+                return 1;
+            }
+        } else if (strcmp(args[i], ">") == 0) {
+            // Przekierowanie wyjścia
+            out_fd = open(args[++i], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (out_fd < 0) {
+                perror("lsh");
+                return 1;
+            }
+        } else if (strcmp(args[i], "2>") == 0) {
+            // Przekierowanie wyjścia błędu
+            err_fd = open(args[++i], O_WRONLY | O_CREAT | O_TRUNC, 0644);
+            if (err_fd < 0) {
+                perror("lsh");
+                return 1;
+            }
+        } else {
+            // Dodanie do aktualnej komendy
+            cmd[cmd_index++] = args[i];
+        }
+    }
+
+    cmd[cmd_index] = NULL;
+    lsh_execute_command(cmd, in_fd, out_fd, err_fd, is_background);
+
+    if (in_fd != STDIN_FILENO) close(in_fd);
+    if (out_fd != STDOUT_FILENO) close(out_fd);
+    if (err_fd != STDERR_FILENO) close(err_fd);
+
+    return 1;
+}
+
+lsh_execute: Funkcja wykonująca komendę z obsługą potoków i przekierowań.
+
+    **char args: Tablica argumentów.
+
+    int is_background: Flaga wskazująca, czy proces ma być uruchomiony w tle.
+
+    Inicjalizacja deskryptorów plików:
+
+        int in_fd = STDIN_FILENO: Ustawia deskryptor pliku wejściowego na standardowe wejście.
+
+        int out_fd = STDOUT_FILENO: Ustawia deskryptor pliku wyjściowego na standardowe wyjście.
+
+        int err_fd = STDERR_FILENO: Ustawia deskryptor pliku wyjścia błędów na standardowe wyjście błędów.
+
+    Inicjalizacja tablicy komend:
+
+        *char cmd[MAX_ARGS]: Tablica do przechowywania aktualnej komendy.
+
+        int cmd_index = 0: Indeks do przechowywania bieżącej pozycji w tablicy cmd.
+
+    Iteracja przez argumenty:
+
+        for (int i = 0; args[i] != NULL; i++): Przechodzi przez wszystkie argumenty.
+
+    Obsługa potoków:
+
+        if (strcmp(args[i], "|") == 0): Sprawdza, czy argument to "|".
+
+            int pipe_fd[2]: Tablica do przechowywania deskryptorów plików potoku.
+
+            pipe(pipe_fd): Tworzy potok.
+
+            cmd[cmd_index] = NULL: Ustawia koniec tablicy komend.
+
+            lsh_execute_command(cmd, in_fd, pipe_fd[1], err_fd, 0): Wykonuje aktualną komendę z wyjściem skierowanym do potoku.
+
+            close(pipe_fd[1]): Zamykacie końcówkę wyjściową potoku.
+
+            in_fd = pipe_fd[0]: Ustawia deskryptor pliku wejściowego na końcówkę wejściową potoku.
+
+            cmd_index = 0: Resetuje indeks tablicy komend.
+
+    Obsługa przekierowania wejścia:
+
+        else if (strcmp(args[i], "<") == 0): Sprawdza, czy argument to "<".
+
+            in_fd = open(args[++i], O_RDONLY): Otwiera plik do odczytu i ustawia deskryptor pliku wejściowego.
+
+            if (in_fd < 0): Sprawdza, czy otwarcie pliku się powiodło.
+
+                perror("lsh"): Wyświetla komunikat o błędzie, jeśli otwarcie pliku się nie powiodło.
+
+                return 1: Zwraca 1, co oznacza błąd.
+
+    Obsługa przekierowania wyjścia:
+
+        else if (strcmp(args[i], ">") == 0): Sprawdza, czy argument to ">".
+
+            out_fd = open(args[++i], O_WRONLY | O_CREAT | O_TRUNC, 0644): Otwiera plik do zapisu, tworzy go, jeśli nie istnieje, i ustawia deskryptor pliku wyjściowego.
+
+            if (out_fd < 0): Sprawdza, czy otwarcie pliku się powiodło.
+
+                perror("lsh"): Wyświetla komunikat o błędzie, jeśli otwarcie pliku się nie powiodło.
+
+                return 1: Zwraca 1, co oznacza błąd.
+
+    Obsługa przekierowania wyjścia błędów:
+
+        else if (strcmp(args[i], "2>") == 0): Sprawdza, czy argument to "2>".
+
+            err_fd = open(args[++i], O_WRONLY | O_CREAT | O_TRUNC, 0644): Otwiera plik do zapisu błędów, tworzy go, jeśli nie istnieje, i ustawia deskryptor pliku wyjścia błędów.
+
+            if (err_fd < 0): Sprawdza, czy otwarcie pliku się powiodło.
+
+                perror("lsh"): Wyświetla komunikat o błędzie, jeśli otwarcie pliku się nie powiodło.
+
+                return 1: Zwraca 1, co oznacza błąd.
+
+    Dodanie argumentu do komendy:
+
+        else: Jeśli argument nie jest specjalnym operatorem.
+
+            cmd[cmd_index++] = args[i]: Dodaje argument do tablicy komend.
+
+    Zakończenie tablicy komend:
+
+        cmd[cmd_index] = NULL: Ustawia koniec tablicy komend.
+
+    Wykonanie komendy:
+
+        lsh_execute_command(cmd, in_fd, out_fd, err_fd, is_background): Wykonuje komendę z odpowiednimi przekierowaniami i flagą is_background.
+
+    Zamykanie deskryptorów plików:
+
+        if (in_fd != STDIN_FILENO) close(in_fd): Zamknięcie deskryptora pliku wejściowego, jeśli nie jest standardowym wejściem.
+
+        if (out_fd != STDOUT_FILENO) close(out_fd): Zamknięcie deskryptora pliku wyjściowego, jeśli nie jest standardowym wyjściem.
+
+        if (err_fd != STDERR_FILENO) close(err_fd): Zamknięcie deskryptora pliku wyjścia błędów, jeśli nie jest standardowym wyjściem błędów.
+
+    Zwrócenie 1: Funkcja zawsze zwraca 1 (komenda została przetworzona).
+
+
+Główna pętla powłoki (kontynuacja)
+c
+
+void lsh_loop() {
+    char *line = NULL;
+    char **args;
+    size_t bufsize = 0;
+
+    signal(SIGCHLD, sigchld_handler);
+    signal(SIGINT, sigint_handler);
+
+    while (1) {
+        printf("lsh> ");
+        if (getline(&line, &bufsize, stdin) == -1) {
+            printf("\n");
+            break;
+        }
+
+        int is_background = 0;
+        args = lsh_parse_line(line, &is_background);
+
+        if (!lsh_handle_builtins(args)) {
+            lsh_execute(args, is_background);
+        }
+
+        free(args);
+    }
+
+    free(line);
+}
+
+lsh_loop: Funkcja głównej pętli powłoki.
+
+    *char line = NULL: Zmienna do przechowywania linii wejściowej.
+
+    **char args: Tablica argumentów komendy.
+
+    size_t bufsize = 0: Rozmiar bufora dla linii wejściowej.
+
+    Rejestrowanie obsługi sygnałów:
+
+        signal(SIGCHLD, sigchld_handler): Rejestruje funkcję obsługi sygnału SIGCHLD, która usunie procesy zombie.
+
+        signal(SIGINT, sigint_handler): Rejestruje funkcję obsługi sygnału SIGINT, która przerywa tylko aktywny proces.
+
+    Główna pętla powłoki:
+
+        while (1): Nieskończona pętla powłoki.
+
+    Wyświetlanie prompta:
+
+        printf("lsh> "): Wyświetla prompt powłoki.
+
+    Odczytywanie linii wejściowej:
+
+        if (getline(&line, &bufsize, stdin) == -1): Odczytuje linię wejściową z terminala.
+
+            getline: Funkcja standardowa do odczytu linii z wejścia.
+
+            &line: Wskaźnik do zmiennej przechowującej linię wejściową.
+
+            &bufsize: Wskaźnik do zmiennej przechowującej rozmiar bufora.
+
+            stdin: Standardowe wejście (terminal).
+
+            if (getline == -1): Sprawdza, czy odczyt linii się nie powiódł.
+
+                printf("\n"): Wyświetla nową linię (domknięcie linii wejściowej).
+
+                break: Przerywa pętlę (koniec powłoki).
+
+    Parsowanie linii wejściowej na argumenty:
+
+        int is_background = 0: Flaga wskazująca, czy proces ma być uruchomiony w tle.
+
+        args = lsh_parse_line(line, &is_background): Parsuje linię wejściową na argumenty i ustawia flagę is_background.
+
+    Obsługa wbudowanych komend:
+
+        if (!lsh_handle_builtins(args)): Sprawdza, czy komenda jest wbudowana.
+
+            lsh_handle_builtins: Funkcja obsługująca komendy wbudowane.
+
+            if (!lsh_handle_builtins(args)): Jeśli komenda nie jest wbudowana, wykonuje ją za pomocą lsh_execute.
+
+    Wykonanie komendy:
+
+        lsh_execute(args, is_background): Wykonuje komendę z odpowiednimi przekierowaniami i flagą is_background.
+
+    Zwalnianie pamięci:
+
+        free(args): Zwalnia pamięć przydzieloną na tablicę argumentów.
+
+    Zwalnianie pamięci na końcu pętli:
+
+        free(line): Zwalnia pamięć przydzieloną na linię wejściową po zakończeniu pętli.
+
+Funkcja główna
+c
+
+int main() {
+    lsh_loop();
+    return 0;
+}
+
+main: Funkcja główna programu.
+
+    int main(): Deklaracja funkcji głównej zwracającej int.
+
+    lsh_loop(): Wywołanie głównej pętli powłoki.
+
+    return 0: Zakończenie programu z kodem wyjścia 0 (sukces).
+
+Podsumowanie
+
+    Nagłówki i stałe: Dołączenie niezbędnych bibliotek i zdefiniowanie stałych.
+
+    Deklaracje funkcji: Deklaracja funkcji używanych w programie.
+
+    Zmienna globalna: Deklaracja zmiennej globalnej do obsługi aktywnego procesu.
+
+    Funkcje obsługi sygnałów: Definicje funkcji obsługujących sygnały.
+
+    Funkcja parsująca linię na argumenty: Funkcja rozdzielająca linię wejściową na argumenty.
+
+    Obsługa wbudowanych komend: Funkcja obsługująca komendy wbudowane (cd, exit).
+
+    Wykonanie pojedynczej komendy: Funkcja wykonująca pojedynczą komendę z uwzględnieniem przekierowań i procesów w tle.
+
+    Wykonanie komendy z obsługą potoków i przekierowań: Funkcja obsługująca komendy z potokami i przekierowaniami.
+
+    Główna pętla powłoki: Funkcja głównej pętli powłoki.
+
+    Funkcja główna: Funkcja główna programu wywołująca główną pętlę powłoki.
