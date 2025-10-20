@@ -1,0 +1,365 @@
+-----------------------------------------------------
+File: d4a-1.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 8, V0: 1 3 6 8 9 11 14 16
+|V1| = 8, V1: 2 4 5 7 10 12 13 15
+
+RUNNING TIME:
+  Loading time: 0.000461 s
+  Execution time: 0.000030 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4a-2.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 50, V0: 1 3 5 7 9 12 14 16 18 20 21 23 25 27 29 32 34 36 38 40 41 43 45 47 49 52 54 56 58 60 61 63 65 67 69 72 74 76 78 80 81 83 85 87 89 92 94 96 98 100
+|V1| = 50, V1: 2 4 6 8 10 11 13 15 17 19 22 24 26 28 30 31 33 35 37 39 42 44 46 48 50 51 53 55 57 59 62 64 66 68 70 71 73 75 77 79 82 84 86 88 90 91 93 95 97 99
+
+RUNNING TIME:
+  Loading time: 0.000668 s
+  Execution time: 0.000056 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4a-3.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 800
+|V1| = 800
+
+RUNNING TIME:
+  Loading time: 0.006397 s
+  Execution time: 0.000970 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4a-4.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 5000
+|V1| = 5000
+
+RUNNING TIME:
+  Loading time: 0.028698 s
+  Execution time: 0.006549 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4a-5.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 80000
+|V1| = 80000
+
+RUNNING TIME:
+  Loading time: 0.308935 s
+  Execution time: 0.069613 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4a-6.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 500000
+|V1| = 500000
+
+RUNNING TIME:
+  Loading time: 2.086167 s
+  Execution time: 0.595720 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4b-1.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.001105 s
+  Execution time: 0.000042 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4b-2.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.001266 s
+  Execution time: 0.000041 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4b-3.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.004347 s
+  Execution time: 0.000260 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4b-4.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.023122 s
+  Execution time: 0.002476 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4b-5.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.347020 s
+  Execution time: 0.036915 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: d4b-6.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 2.191975 s
+  Execution time: 0.223499 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: my_graph_bipartite_D.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 6, V0: 1 4 5 8 9 12
+|V1| = 6, V1: 2 3 6 7 10 11
+
+RUNNING TIME:
+  Loading time: 0.041563 s
+  Execution time: 0.000045 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: my_graph_bipartite_U.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 6, V0: 1 4 5 8 9 12
+|V1| = 6, V1: 2 3 6 7 10 11
+
+RUNNING TIME:
+  Loading time: 0.020156 s
+  Execution time: 0.000029 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: my_graph_not_bipartite_D.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.024954 s
+  Execution time: 0.000020 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: my_graph_not_bipartite_U.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.019940 s
+  Execution time: 0.000017 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4a-1.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 5, V0: 1 4 5 6 7
+|V1| = 10, V1: 2 3 8 9 10 11 12 13 14 15
+
+RUNNING TIME:
+  Loading time: 0.000734 s
+  Execution time: 0.000023 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4a-2.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 85, V0: 1 4 5 6 7 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 64 65 66 67 68 69 70 71 72 73 74 75 76 77 78 79 80 81 82 83 84 85 86 87 88 89 90 91 92 93 94 95 96 97 98 99 100 101 102 103 104 105 106 107 108 109 110 111 112 113 114 115 116 117 118 119 120 121 122 123 124 125 126 127
+|V1| = 42, V1: 2 3 8 9 10 11 12 13 14 15 32 33 34 35 36 37 38 39 40 41 42 43 44 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63
+
+RUNNING TIME:
+  Loading time: 0.000686 s
+  Execution time: 0.000071 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4a-3.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 341
+|V1| = 682
+
+RUNNING TIME:
+  Loading time: 0.002577 s
+  Execution time: 0.001199 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4a-4.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 5461
+|V1| = 10922
+
+RUNNING TIME:
+  Loading time: 0.030364 s
+  Execution time: 0.008475 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4a-5.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 87381
+|V1| = 43690
+
+RUNNING TIME:
+  Loading time: 0.217051 s
+  Execution time: 0.047597 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4a-6.txt
+
+BIPARTITE RESULT:
+The graph IS bipartite
+
+PARTITION DETAILS:
+|V0| = 349525
+|V1| = 699050
+
+RUNNING TIME:
+  Loading time: 1.909018 s
+  Execution time: 0.503502 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4b-1.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.001162 s
+  Execution time: 0.000044 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4b-2.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.001114 s
+  Execution time: 0.000039 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4b-3.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.001996 s
+  Execution time: 0.000206 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4b-4.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.034945 s
+  Execution time: 0.003036 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4b-5.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 0.191206 s
+  Execution time: 0.022464 s
+-----------------------------------------------------
+-----------------------------------------------------
+File: u4b-6.txt
+
+BIPARTITE RESULT:
+The graph IS NOT bipartite
+
+PARTITION DETAILS:
+
+RUNNING TIME:
+  Loading time: 1.988492 s
+  Execution time: 0.248510 s
+-----------------------------------------------------
+Implemented algorithm (BFS coloring) complexity: O(|V| + |E|).
