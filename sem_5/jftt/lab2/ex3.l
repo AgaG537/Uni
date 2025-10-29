@@ -11,6 +11,8 @@ int yywrap(void);
 %x IN_DOXYGEN_COMMENT
 %x IN_DOUBLE_QUOTE
 %x IN_SINGLE_QUOTE
+%x IN_SINGLE_LINE
+%x IN_SINGLE_LINE_DOXYGEN
 
 
 %%
@@ -65,33 +67,48 @@ int yywrap(void);
 }
 
 
-
+<IN_C_COMMENT>\\\n {}
 <IN_C_COMMENT>\n { ECHO; }
-<IN_C_COMMENT>. { } 
+<IN_C_COMMENT>. {} 
 
+<IN_DOXYGEN_COMMENT>\\\n { ECHO; }
 <IN_DOXYGEN_COMMENT>\n { ECHO; }
 <IN_DOXYGEN_COMMENT>.  { ECHO; } 
 
 
 
-<INITIAL>"///".* {
+<INITIAL>"///" {
     if (doxygen_mode) {
+        BEGIN(IN_SINGLE_LINE_DOXYGEN);
         ECHO;
-    } else {}
+    } else {
+        BEGIN(IN_SINGLE_LINE);
+    }
+}
+<INITIAL>"//!" {
+    if (doxygen_mode) {
+        BEGIN(IN_SINGLE_LINE_DOXYGEN);
+        ECHO;
+    } else {
+        BEGIN(IN_SINGLE_LINE);
+    }
 }
 
-<INITIAL>"//!".* {
-    if (doxygen_mode) {
-        ECHO;
-    } else {}
+<INITIAL>"//" {
+    BEGIN(IN_SINGLE_LINE);
 }
 
+<IN_SINGLE_LINE>\\\n {} 
+<IN_SINGLE_LINE>\n { ECHO; BEGIN(INITIAL); }
+<IN_SINGLE_LINE>. {}
+
+<IN_SINGLE_LINE_DOXYGEN>\\\n { ECHO; }
+<IN_SINGLE_LINE_DOXYGEN>\n { ECHO; BEGIN(INITIAL); }
+<IN_SINGLE_LINE_DOXYGEN>. { ECHO; }
 
 
-<INITIAL>"//".* {}
-
-<INITIAL>. { ECHO; } 
-<INITIAL>\n { ECHO; } 
+<INITIAL>. { ECHO; }
+<INITIAL>\n { ECHO; }
 
 %%
 
