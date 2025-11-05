@@ -1,0 +1,5 @@
+key,value
+normal_capacity,100
+inventory_capacity,70
+holding_cost,1500
+initial_inventory,15

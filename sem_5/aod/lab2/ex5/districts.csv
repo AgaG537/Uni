@@ -1,0 +1,4 @@
+District,MinShift1,MinShift2,MinShift3,MaxShift1,MaxShift2,MaxShift3
+p1,2,4,3,3,7,5
+p2,3,6,5,5,7,10
+p3,5,7,6,8,12,10
