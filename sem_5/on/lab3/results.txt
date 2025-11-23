@@ -1,0 +1,295 @@
+------------ Exercise 4 ------------
+f(x) = sin(x) - (x/2)^2
+Delta = 5.0e-6, Epsilon = 5.0e-6, Max_it = 20
+
+1. BISECTION METHOD:
+Initial interval [a, b]:  [1.5, 2.0]
+Root (r):         1.9337539672851562
+f(r) value (v):   -2.7027680138402843e-7
+Iterations (it):  16
+Error code (err): 0
+
+2. NEWTON'S METHOD:
+Initial value x0:  1.5
+Root (r):         1.933753779789742
+f(r) value (v):   -2.2423316314856834e-8
+Iterations (it):  4
+Error code (err): 0
+
+3. SECANT METHOD:
+Initial values x0, x1:  1.0, 2.0
+Root (r):         1.933753644474301
+f(r) value (v):   1.564525129449379e-7
+Iterations (it):  4
+Error code (err): 0
+
+
+
+
+------------ Exercise 5 ------------
+f(x) = 3x - exp(x)
+Delta = 0.0001, Epsilon = 0.0001
+
+ROOT 1:
+Initial interval [a, b]:  [0.5, 1.0]
+Root (r):         0.619140625
+f(r) value (v):   9.066320343276146e-5
+Iterations (it):  8
+Error code (err): 0
+
+ROOT 2:
+Initial interval [a, b]:  [1.0, 2.0]
+Root (r):         1.5120849609375
+f(r) value (v):   7.618578602741621e-5
+Iterations (it):  13
+Error code (err): 0
+
+
+
+
+------------ Exercise 6 ------------
+Delta = 1.0e-5, Epsilon = 1.0e-5, Max_it = 100
+
+
+1. FUNCTION f1:
+
+1.1.1. BISECTION METHOD:
+Initial interval [a, b]:  [0.0, 2.0]
+Root (r):         1.0
+f(r) value (v):   0.0
+Iterations (it):  1
+Error code (err): 0
+
+1.1.2. BISECTION METHOD:
+Initial interval [a, b]:  [0.0, 3.0]
+Root (r):         1.0000076293945312
+f(r) value (v):   -7.6293654275305656e-6
+Iterations (it):  17
+Error code (err): 0
+
+1.1.3. BISECTION METHOD:
+Initial interval [a, b]:  [-100.0, 100.0]
+Root (r):         0.9999990463256836
+f(r) value (v):   9.536747711536009e-7
+Iterations (it):  23
+Error code (err): 0
+
+1.1.4. BISECTION METHOD:
+Initial interval [a, b]:  [-1.0, 1500.0]
+Root (r):         1.000002846121788
+f(r) value (v):   -2.846117737820286e-6
+Iterations (it):  26
+Error code (err): 0
+
+1.2.1. NEWTON'S METHOD:
+Initial value x0:  0.5
+Root (r):         0.9999999998878352
+f(r) value (v):   1.1216494399945987e-10
+Iterations (it):  4
+Error code (err): 0
+
+1.2.2. NEWTON'S METHOD:
+Initial value x0:  1.5
+Root (r):         0.9999999984736215
+f(r) value (v):   1.5263785790864404e-9
+Iterations (it):  4
+Error code (err): 0
+
+1.2.3. NEWTON'S METHOD:
+Initial value x0:  10.0
+Root (r):         NaN
+f(r) value (v):   NaN
+Iterations (it):  100
+Error code (err): 1
+
+1.2.4. NEWTON'S METHOD:
+Initial value x0:  -10.0
+Root (r):         0.9999999998781014
+f(r) value (v):   1.2189871334555846e-10
+Iterations (it):  15
+Error code (err): 0
+
+1.2.5. NEWTON'S METHOD:
+Initial value x0:  -100.0
+Root (r):         -0.2024165040950583
+f(r) value (v):   2.328149700587754
+Iterations (it):  100
+Error code (err): 1
+
+1.2.6. NEWTON'S METHOD:
+Initial value x0:  100.0
+Root (r):         100.0
+f(r) value (v):   -1.0
+Iterations (it):  1
+Error code (err): 2
+
+1.3.1. SECANT METHOD:
+Initial values x0, x1:  0.5, 1.5
+Root (r):         0.9999999624498374
+f(r) value (v):   3.755016342310569e-8
+Iterations (it):  5
+Error code (err): 0
+
+1.3.2. SECANT METHOD:
+Initial values x0, x1:  -2.0, 2.0
+Root (r):         1.0000000080618678
+f(r) value (v):   -8.061867839970205e-9
+Iterations (it):  8
+Error code (err): 0
+
+1.3.3. SECANT METHOD:
+Initial values x0, x1:  0.0, 5.0
+Root (r):         3.1820380425510413
+f(r) value (v):   -0.8871886182027999
+Iterations (it):  3
+Error code (err): 0
+
+1.3.4. SECANT METHOD:
+Initial values x0, x1:  -10.0, -7.0
+Root (r):         0.9999997162784523
+f(r) value (v):   2.8372158800138436e-7
+Iterations (it):  17
+Error code (err): 0
+
+1.3.5. SECANT METHOD:
+Initial values x0, x1:  8.0, 10.0
+Root (r):         8.0
+f(r) value (v):   -0.9990881180344455
+Iterations (it):  2
+Error code (err): 0
+
+1.3.6. SECANT METHOD:
+Initial values x0, x1:  -100.0, -90.0
+Root (r):         -21.15064638085144
+f(r) value (v):   4.1677675955236554e9
+Iterations (it):  100
+Error code (err): 1
+
+
+2. FUNCTION f2:
+
+2.1.1. BISECTION METHOD:
+Initial interval [a, b]:  [-1.0, 1.0]
+Root (r):         0.0
+f(r) value (v):   0.0
+Iterations (it):  1
+Error code (err): 0
+
+2.1.2. BISECTION METHOD:
+Initial interval [a, b]:  [-1.0, 2.0]
+Root (r):         7.62939453125e-6
+f(r) value (v):   7.62933632381113e-6
+Iterations (it):  17
+Error code (err): 0
+
+2.1.3. BISECTION METHOD:
+Initial interval [a, b]:  [-10.0, 11.0]
+Root (r):         1.9073486328125e-6
+f(r) value (v):   1.9073449948371624e-6
+Iterations (it):  19
+Error code (err): 0
+
+2.1.4. BISECTION METHOD:
+Initial interval [a, b]:  [-10.0, 110.0]
+Root (r):         50.0
+f(r) value (v):   9.643749239819589e-21
+Iterations (it):  1
+Error code (err): 0
+
+2.2.1. NEWTON'S METHOD:
+Initial value x0:  -0.5
+Root (r):         -3.0642493416461764e-7
+f(r) value (v):   -3.0642502806087233e-7
+Iterations (it):  4
+Error code (err): 0
+
+2.2.2. NEWTON'S METHOD:
+Initial value x0:  -10.0
+Root (r):         -3.784424932490619e-7
+f(r) value (v):   -3.784426364678097e-7
+Iterations (it):  16
+Error code (err): 0
+
+2.2.3. NEWTON'S METHOD:
+Initial value x0:  0.5
+Root (r):         -3.0642493416461764e-7
+f(r) value (v):   -3.0642502806087233e-7
+Iterations (it):  5
+Error code (err): 0
+
+2.2.4. NEWTON'S METHOD:
+Initial value x0:  1.0
+Root (r):         1.0
+f(r) value (v):   0.36787944117144233
+Iterations (it):  1
+Error code (err): 2
+
+2.2.5. NEWTON'S METHOD:
+Initial value x0:  1.5
+Root (r):         14.787436802837927
+f(r) value (v):   5.594878975694858e-6
+Iterations (it):  10
+Error code (err): 0
+
+2.2.6. NEWTON'S METHOD:
+Initial value x0:  50.0
+Root (r):         50.0
+f(r) value (v):   9.643749239819589e-21
+Iterations (it):  0
+Error code (err): 0
+
+2.2.7. NEWTON'S METHOD:
+Initial value x0:  -100.0
+Root (r):         -3.2905929088682004
+f(r) value (v):   -88.38132333845007
+Iterations (it):  100
+Error code (err): 1
+
+2.3.1. SECANT METHOD:
+Initial values x0, x1:  -0.5, 0.5
+Root (r):         5.38073548562323e-6
+f(r) value (v):   5.380706533386756e-6
+Iterations (it):  6
+Error code (err): 0
+
+2.3.2. SECANT METHOD:
+Initial values x0, x1:  -0.5, 1.0
+Root (r):         7.367119728946578e-6
+f(r) value (v):   7.3670654546934e-6
+Iterations (it):  10
+Error code (err): 0
+
+2.3.3. SECANT METHOD:
+Initial values x0, x1:  -5.0, -10.0
+Root (r):         -1.3163793904651081e-8
+f(r) value (v):   -1.3163794077936554e-8
+Iterations (it):  16
+Error code (err): 0
+
+2.3.4. SECANT METHOD:
+Initial values x0, x1:  -10.0, 11.0
+Root (r):         10.999999982484285
+f(r) value (v):   0.0001837187116181246
+Iterations (it):  1
+Error code (err): 0
+
+2.3.5. SECANT METHOD:
+Initial values x0, x1:  8.0, 9.0
+Root (r):         14.289416415442075
+f(r) value (v):   8.896102815708247e-6
+Iterations (it):  7
+Error code (err): 0
+
+2.3.6. SECANT METHOD:
+Initial values x0, x1:  -100.0, -90.0
+Root (r):         -22.520006955048267
+f(r) value (v):   -1.3579484174684215e11
+Iterations (it):  100
+Error code (err): 1
+
+2.3.7. SECANT METHOD:
+Initial values x0, x1:  30.0, 40.0
+Root (r):         40.000605369041786
+f(r) value (v):   1.6983389872333798e-16
+Iterations (it):  1
+Error code (err): 0
