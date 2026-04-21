@@ -122,13 +122,13 @@ def plot_tour_to_file(tour, node_coords, title, filename, is_mst=False):
     plt.grid(True, linestyle=':', alpha=0.7, color='gray')
     plt.tight_layout()
     
-    filepath = os.path.join('plots', filename)
+    filepath = os.path.join('plots1', filename)
     plt.savefig(filepath, dpi=300)
     plt.close()
 
 def main():
     n_draws = 1000
-    os.makedirs('plots', exist_ok=True)
+    os.makedirs('plots1', exist_ok=True)
     
     for country_name, filename in DATA_FILES.items():
         print(f"\n{country_name}:")
